@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvc-mapping
+  namespace: cattle-prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app: pvc-exporter
+  template:
+    metadata:
+      labels:
+        app: pvc-exporter
+    spec:
+      containers:
+      - args:
+        - python
+        - pvc-mapping.py
+        image: harbor.ks.com/library/python-k8s-prome:v1
+        imagePullPolicy: Always
+        name: pvc-mapping
+        ports:
+        - containerPort: 8849
+          hostPort: 8849
+          name: metric
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /usr/src/app
+          name: vol1
+      volumes:
+      - hostPath:
+          path: /root/pvc-export
+        name: vol1
