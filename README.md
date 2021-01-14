@@ -14,3 +14,5 @@ kubectl apply -f namespace.yml -f rbac.yml -f deployment.yml -f daemonset.yml -f
 # Grafana
 
 You can import the pvc_usage-dashboard to grafana to monitor pvc usage.
+![grafana-1](./grafana-1.PNG)
+The format is pod:pvc.
