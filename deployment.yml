@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: pod-pvc-mapping
-        image: pod-pvc-mapping:v1.0
+        image: dockerid31415926/pod-pvc-mapping
         ports:
         - containerPort: 8849
           name: metrics
