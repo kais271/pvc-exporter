@@ -30,5 +30,5 @@ while 1:
                     else:
                         g.labels(pvc,pod)
                         pool[pvc]=pod
-    sleep(30)
+    sleep(15)
 
