@@ -7,16 +7,6 @@ pool={}
 while 1:
     config.load_incluster_config()
     k8s_api_obj = client.CoreV1Api()
-    '''ApiToken = "kubeconfig-user-ngbzm.c-twwkt:wsq5bjl8fjd6hd45fh4p5ldbls2lplpl6m4zdqw84cw6529nxtwbwb"
-    configuration = client.Configuration()
-    setattr(configuration, 'verify_ssl', False)
-    client.Configuration.set_default(configuration)
-    configuration.host = "https://kubernetes.default.svc.cluster.local"
-    configuration.verify_ssl = False
-    configuration.debug = True
-    configuration.api_key = {"authorization": "Bearer " + ApiToken}
-    client.Configuration.set_default(configuration)
-    k8s_api_obj  = client.CoreV1Api(client.ApiClient(configuration))'''
     ret=k8s_api_obj.list_namespace()
     ret=ret.to_dict()
     ret=ret['items']
