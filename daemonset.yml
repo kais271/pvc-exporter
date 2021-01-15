@@ -22,7 +22,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: block-pvc-scanner
-        image: block-pvc-scanner:v1.1
+        image: dockerid31415926/block-pvc-scanner
         ports:
         - containerPort: 8848
           name: metrics
