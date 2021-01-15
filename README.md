@@ -5,6 +5,7 @@ This item provides 2 metrics,one for monitoring mounted pvc usage precent named 
 Only used to monitor mounted pvc that provied by block storage provisioner. Such as longgorn,trident,rook-ceph,etc..
  
 # Install
+You can get the following files and run apply them.
 kubectl apply -f namespace.yml -f rbac.yml -f deployment.yml -f daemonset.yml -f servicemonitor.yml
 
 # Grafana
