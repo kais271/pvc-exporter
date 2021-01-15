@@ -1,5 +1,5 @@
 # pvc-exporter
-This item provides 2 metrics,one for monitoring mounted pvc usage named pvc_usage, and one for provides the mapping between pod and pvc named pvc_mapping.
+This item provides 2 metrics,one for monitoring mounted pvc usage precent named pvc_usage, and one for provides the mapping between pod and pvc named pvc_mapping.
 # Note:
 Only used to monitor mounted pvc that provied by block storage provisioner. Such as longgorn,trident,rook-ceph,etc..
 # Details
