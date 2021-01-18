@@ -1,0 +1,22 @@
+# Default values for pvc-exporter.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespace: pvc-exporter
+
+PodPvcMapping:
+  image: dockerid31415926/pod-pvc-mapping
+  pullPolicy: IfNotPresent
+  containerPort: 8849
+  service:
+    type: NodePort
+    port: 8849
+
+
+BlockPvcScanner:
+  image: dockerid31415926/block-pvc-scanner
+  pullPolicy: IfNotPresent
+  containerPort: 8848
+  service:
+    type: NodePort
+    port: 8848

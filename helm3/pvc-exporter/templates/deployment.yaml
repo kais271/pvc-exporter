@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-pvc-mapping
+  namespace: {{.Values.namespace}}
+  labels:
+    app: pvc-exporter
+    com: pod-pvc-mapping
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pvc-exporter
+      com: pod-pvc-mapping
+  template:
+    metadata:
+      labels:
+        app: pvc-exporter
+        com: pod-pvc-mapping
+    spec:
+      containers:
+      - name: pod-pvc-mapping
+        image: {{.Values.PodPvcMapping.image}}
+        ports:
+        - containerPort: {{.Values.PodPvcMapping.containerPort}}
+          name: metrics
+      serviceAccountName: pvc-exporter-sa
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pvc-exporter
+    com: pod-pvc-mapping
+  name: pod-pvc-mapping
+  namespace: {{.Values.namespace}}
+spec:
+  ports:
+  - port: {{.Values.PodPvcMapping.service.port}}
+    name: metrics
+    protocol: TCP
+    targetPort: {{.Values.PodPvcMapping.containerPort}}
+  selector:
+    app: pvc-exporter
+    com: pod-pvc-mapping
+  type: {{.Values.PodPvcMapping.service.type}}

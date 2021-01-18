@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: pvc-exporter
+  name: pvc-exporter
+  namespace: {{.Values.namespace}}
+spec:
+  selector:
+    matchLabels:
+      app: pvc-exporter
+  endpoints:
+  - interval: 30s
+    targetPort: metrics
+    scheme: http
+    path: /
+  jobLabel: app

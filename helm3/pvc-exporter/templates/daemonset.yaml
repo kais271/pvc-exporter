@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: block-pvc-scanner
+  namespace: {{.Values.namespace}}
+  labels:
+    app: pvc-exporter
+    com: block-pvc-scanner
+spec:
+  selector:
+    matchLabels:
+      com: block-pvc-scanner
+      app: pvc-exporter
+  template:
+    metadata:
+      labels:
+        com: block-pvc-scanner
+        app: pvc-exporter
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: block-pvc-scanner
+        image: {{.Values.BlockPvcScanner.image}}
+        ports:
+        - containerPort: {{.Values.BlockPvcScanner.containerPort}}
+          name: metrics
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        volumeMounts:
+        - name: root-path
+          mountPath: /host
+          readOnly: true
+      volumes:
+      - name: root-path
+        hostPath:
+          path: /
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pvc-exporter
+    com: block-pvc-scanner
+  name: block-pvc-scanner
+  namespace: {{.Values.namespace}}
+spec:
+  ports:
+  - port: {{.Values.BlockPvcScanner.service.port}}
+    name: metrics
+    protocol: TCP
+    targetPort: {{.Values.BlockPvcScanner.containerPort}}
+  selector:
+    app: pvc-exporter
+    com: block-pvc-scanner
+  type: {{.Values.BlockPvcScanner.service.type}}
