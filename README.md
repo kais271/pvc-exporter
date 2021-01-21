@@ -5,9 +5,10 @@ This item provides 2 metrics,one for monitoring mounted pvc usage precent named 
 Only used to monitor mounted pvc that provied by block storage provisioner. Such as longgorn,trident,rook-ceph,etc..
 
 # Support list
-longgorn
-trident
-rook-ceph
+The following storage provisioners has been tested..
+longgorn  
+trident  
+rook-ceph  
 aliyun flexvolume
  
 # Install
