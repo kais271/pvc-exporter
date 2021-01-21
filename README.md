@@ -6,10 +6,10 @@ Only used to monitor mounted pvc that provied by block storage provisioner. Such
 
 # Support list
 The following storage provisioners has been tested..
-longgorn  
-trident  
-rook-ceph  
-aliyun flexvolume
+1.longgorn  
+2.trident  
+3.rook-ceph  
+4.aliyun flexvolume
  
 # Install
 You can get the following files and run apply them.
