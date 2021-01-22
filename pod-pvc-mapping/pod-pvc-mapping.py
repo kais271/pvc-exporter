@@ -2,7 +2,7 @@ from kubernetes import client, config
 from prometheus_client import start_http_server, Gauge
 from time import sleep
 start_http_server(8849)
-g=Gauge('pvc_mapping','fetching the mapping between pod and pvc',['persistentvolumeclaim','mountedby'])
+g=Gauge('pvc_mapping','fetching the mapping between pod and pvc',['persistentvolumeclaim','volumename','mountedby'])
 
 pool={}
 
