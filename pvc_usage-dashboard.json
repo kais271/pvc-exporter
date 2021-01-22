@@ -157,7 +157,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "label_join((sum without (pod,service,namespace,job,instance,endpoint) (pvc_usage)) + on(volumename) group_left(storageclass,namespace,node,persistentvolumeclaim) kube_persistentvolumeclaim_info*0 + on(persistentvolumeclaim) group_left(mountedby) pvc_mapping*0,\"pod_pvc\",\":\",\"mountedby\",\"persistentvolumeclaim\")",
+          "expr": "label_join((sum without (pod,service,namespace,job,instance,endpoint) (pvc_usage)) + on(volumename) group_left(persistentvolumeclaim,mountedby)pvc_mapping*0,\"pod_pvc\",\" : \",\"mountedby\",\"persistentvolumeclaim\")",
           "interval": "",
           "legendFormat": "{{pod_pvc}}",
           "refId": "A"
