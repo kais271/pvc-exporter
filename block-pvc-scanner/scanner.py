@@ -3,13 +3,13 @@ from prometheus_client import start_http_server, Gauge
 g=Gauge('pvc_usage','fetching usge matched by k8s csi',['volumename'])
 start_http_server(8848)
 while 1:
-  get_pvc=os.popen("df -h|grep -E 'kubernetes.io/flexvolume|kubernetes.io~csi'")
+  get_pvc=os.popen("df -h|grep -E 'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts'")
   pvcs=get_pvc.readlines()
   for i in pvcs:
     il=i.split(' ')
     volume=il[-1].split('/')[-1]
     for v in il[-1].split('/'):
-      if re.match("^pvc",v):
+      if re.match("pvc",v):
         volume=v
     for u in il:
       if re.match("^[0-9]*\%",u):
