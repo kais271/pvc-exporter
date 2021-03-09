@@ -9,8 +9,10 @@ while 1:
     il=i.split(' ')
     volume=il[-1].split('/')[-1]
     for v in il[-1].split('/'):
-      if re.match("pvc",v):
+      if re.match("^pvc",v):
         volume=v
+      elif re.match("^gke-data",v):
+        volume='pvc'+v.split('pvc')[-1]
     for u in il:
       if re.match("^[0-9]*\%",u):
         usage=float(u.strip('%'))/100.0
