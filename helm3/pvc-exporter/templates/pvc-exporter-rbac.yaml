@@ -1,7 +1,8 @@
+{{- $fullName := include "pvc-exporter.fullname" . -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: pvc-exporter-cr
+  name: {{ $fullName }}-cr
 rules:
 - apiGroups:
   - '*'
@@ -18,23 +19,21 @@ rules:
   - 'list'
   - 'watch'
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: pvc-exporter-sa
-  namespace: {{.Values.namespace}}
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: pvc-exporter-crbinding
+  name: {{ $fullName }}-crbinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: pvc-exporter-cr
+  name: {{ $fullName }}-cr
 subjects:
 - kind: ServiceAccount
-  name: pvc-exporter-sa
+  name: {{ $fullName }}-sa
   namespace: {{.Values.namespace}}
-
-
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $fullName }}-sa
+  namespace: {{.Values.namespace}}
