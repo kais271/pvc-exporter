@@ -1,0 +1,23 @@
+{{- $fullName := include "pvc-exporter.fullname" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ $fullName }}
+    com: {{ $fullName }}-block-pvc-scanner
+  name: {{ $fullName }}-block-pvc-scanner
+  namespace: {{.Values.namespace}}
+spec:
+  ports:
+  - port: {{.Values.BlockPvcScanner.service.port}}
+    name: metrics
+    protocol: TCP
+    targetPort: {{.Values.BlockPvcScanner.containerPort}}
+  selector:
+    app: {{ $fullName }}
+    com: {{ $fullName }}-block-pvc-scanner
+  {{- if .Values.BlockPvcScanner.service.headless }}
+  clusterIP: None
+  {{- else }}
+  type: {{.Values.BlockPvcScanner.service.type }}  }
+  {{- end }}
