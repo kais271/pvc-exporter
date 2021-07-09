@@ -5,6 +5,13 @@ metadata:
   labels:
     app: {{ $fullName }}
     com: {{ $fullName }}-block-pvc-scanner
+    {{- with .Values.BlockPvcScanner.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.BlockPvcScanner.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   name: {{ $fullName }}-block-pvc-scanner
   namespace: {{.Values.namespace}}
 spec:
