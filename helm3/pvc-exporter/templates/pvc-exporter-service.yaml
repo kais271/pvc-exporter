@@ -26,5 +26,5 @@ spec:
   {{- if .Values.BlockPvcScanner.service.headless }}
   clusterIP: None
   {{- else }}
-  type: {{.Values.BlockPvcScanner.service.type }}  }
+  type: {{.Values.BlockPvcScanner.service.type }}
   {{- end }}
