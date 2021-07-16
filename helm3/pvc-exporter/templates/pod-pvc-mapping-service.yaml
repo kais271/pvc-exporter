@@ -1,0 +1,30 @@
+{{- $fullName := include "pvc-exporter.fullname" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ $fullName }}
+    com: {{ $fullName }}-pod-pvc-mapping
+    {{- with .Values.PodPvcMapping.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.PodPvcMapping.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ $fullName }}-pod-pvc-mapping
+  namespace: {{.Values.namespace}}
+spec:
+  ports:
+  - port: {{.Values.PodPvcMapping.service.port}}
+    name: metrics
+    protocol: TCP
+    targetPort: {{.Values.PodPvcMapping.containerPort}}
+  selector:
+    app: {{ $fullName }}
+    com: {{ $fullName }}-pod-pvc-mapping
+  {{- if .Values.PodPvcMapping.service.headless }}
+  clusterIP: None
+  {{- else }}
+  type: {{.Values.PodPvcMapping.service.type }}
+  {{- end }}
