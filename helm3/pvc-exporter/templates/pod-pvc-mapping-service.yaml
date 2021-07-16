@@ -26,5 +26,5 @@ spec:
   {{- if .Values.PodPvcMapping.service.headless }}
   clusterIP: None
   {{- else }}
-  type: {{.Values.PodPvcMapping.service.type }}  }
+  type: {{.Values.PodPvcMapping.service.type }}
   {{- end }}
