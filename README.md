@@ -9,7 +9,7 @@ The following storage provisioners has been tested..
 1.longgorn  
 2.trident  
 3.rook-ceph  
-4.aliyun flexvolume
+4.aliyun flexvolume  
 5.iomesh
  
 # Install
