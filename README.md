@@ -16,8 +16,7 @@ The following storage provisioners has been confirmed to be working:
 
 ## Install
 
-You can get the following files and run apply them.
-kubectl apply -f namespace.yml -f rbac.yml -f deployment.yml -f daemonset.yml -f servicemonitor.yml
+TODO: Helmchart
 
 ## Grafana
 
