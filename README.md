@@ -18,9 +18,14 @@ The following storage provisioners has been confirmed to be working:
 * iomesh
 * nutanix-csi
 
-## Install
+## Usage
 
-TODO: Helmchart
+Using the helm chart simply with this commands:
+
+```shell
+helm repo add mariof-charts https://mario-f.github.io/helm-charts/
+helm install kubevis mariof-charts/pve-exporter
+```
 
 ## Grafana
 
