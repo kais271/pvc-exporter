@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--debug", action='store_true')
 parser.add_argument("-s", "--scanner", action='store_true')
 parser.add_argument("-m", "--mapper", action='store_true')
+parser.add_argument("-p", "--port", type=int, default=8089, help="Port to expose prometheus metrics")
 parser.add_argument("-i", "--interval", type=int, default=10, help="Interval for pulling host system")
 args = parser.parse_args()
 
@@ -24,7 +25,7 @@ def main():
   if args.scanner:
     _debug("Starting scanner task")
     g=Gauge('pvc_usage','fetching usge matched by k8s csi',['volumename'])
-    start_http_server(8848)
+    start_http_server(args.port)
     while 1:
       _debug("Get mounts by command")
       get_pvc=os.popen("df -h|grep -E 'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts'")
@@ -49,7 +50,7 @@ def main():
   # Execute mapping task
   if args.mapper:
     _debug("Starting scanner task")
-    start_http_server(8849)
+    start_http_server(args.port)
     g=Gauge('pvc_mapping','fetching the mapping between pod and pvc',['persistentvolumeclaim','volumename','mountedby'])
     pool={}
     def get_items(obj):
