@@ -24,7 +24,7 @@ Using the helm chart simply with this commands:
 
 ```shell
 helm repo add mariof-charts https://mario-f.github.io/helm-charts/
-helm install pve-exporter mariof-charts/pve-exporter
+helm install pvc-exporter mariof-charts/pvc-exporter
 ```
 
 ## Grafana
