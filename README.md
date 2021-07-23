@@ -29,6 +29,6 @@ helm install pvc-exporter mariof-charts/pvc-exporter
 
 ## Grafana
 
-You can import the [pvc_usage-dashboard](./docs/pvc_usage-dashboard.json) to grafana for monitoring pvc usage.
+You can import the [pvc-exporter-dashboard](./docs/pvc-exporter-dashboard.json) to grafana for monitoring pvc usage.
 ![grafana-1](./docs/grafana-1.PNG)
 The legend format is pod:pvc.
