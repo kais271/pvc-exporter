@@ -10,7 +10,8 @@ The following storage provisioners has been tested..
 2.trident  
 3.rook-ceph  
 4.aliyun flexvolume  
-5.iomesh
+5.iomesh  
+6.nutanix-csi
  
 # Install
 You can get the following files and run apply them.
