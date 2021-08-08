@@ -7,6 +7,8 @@ start_http_server(8848)
 while 1:
   get_pvc=os.popen("df -h|grep -E 'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts'")
   all_pvcs=get_pvc.readlines()
+  if(len(all_pvcs) == 0):
+    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'Warning: Not found block storage pvc.Or not supported yet.')
   for pvc in all_pvcs:
     #get pvc name
     pvc_info=pvc.split(' ')
@@ -21,7 +23,7 @@ while 1:
       #get pvc usgae
       if re.match("^[0-9]*\%",pvc_usage):
         pvc_usage=float(pvc_usage.strip('%'))/100.0
-        print(volume,pvc_usage)
+        print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), volume, pvc_usage)
         g.labels(volume).set(pvc_usage)
 
   time.sleep(15)
