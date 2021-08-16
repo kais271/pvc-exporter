@@ -32,6 +32,16 @@ PodPvcMapping:
   - key: node-role.kubernetes.io/master
     effect: NoSchedule
 
+  livenessProbe:
+    httpGet:
+      path: /
+      port: metrics
+    timeoutSeconds: 3
+    failureThreshold: 3
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    successThreshold: 1
+
 BlockPvcScanner:
   image:
     repository: dockerid31415926/block-pvc-scanner
@@ -63,6 +73,16 @@ BlockPvcScanner:
     requests:
       cpu: 100m
       memory: 200Mi
+
+  livenessProbe:
+    httpGet:
+      path: /
+      port: metrics
+    timeoutSeconds: 3
+    failureThreshold: 3
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    successThreshold: 1
 
 serviceMonitor:
   enabled: true
