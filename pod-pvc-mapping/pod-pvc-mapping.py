@@ -11,9 +11,7 @@ pool = {}
 
 
 def get_items(obj):
-    formatting = obj.to_dict()
-    items = formatting['items']
-    return items
+    return obj.to_dict()['items']
 
 
 while 1:
@@ -28,11 +26,15 @@ while 1:
             for vc in p['spec']['volumes']:
                 if vc['persistent_volume_claim']:
                     pvc = vc['persistent_volume_claim']['claim_name']
+                    vol = None
                     for v in pvcs:
                         if v['metadata']['name'] == pvc:
                             vol = v['spec']['volume_name']
                     pod = p['metadata']['name']
-                    print("PVC: %s, VOLUME: %s, POD: %s" % (pvc, vol, pod))
+                    if vol is not None:
+                        print("PVC: %s, VOLUME: %s, POD: %s" % (pvc, vol, pod))
+                    else:
+                        print("PVC: %s, POD %s, VOLUME was undefined" % (pvc, pod))
                     if pvc in pool.keys():
                         g.remove(pvc, pool[pvc][0], pool[pvc][1])
                         g.labels(pvc, vol, pod)
