@@ -1,4 +1,6 @@
+{{- if .Values.createNamespace | default true }}
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: pvc-exporter
+  name: {{ .Values.namespace }}
+  {{- end }}

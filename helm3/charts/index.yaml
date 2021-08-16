@@ -1,0 +1,22 @@
+apiVersion: v1
+entries:
+  pvc-exporter:
+  - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2021-08-16T15:43:46.681207819+08:00"
+    digest: be035aedba12f50efbbdb394b4ae905249830a52c4d4ddd3f33d2ee89b3df54a
+    name: pvc-exporter
+    type: application
+    urls:
+    - pvc-exporter-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 0.1.1-fix
+    created: "2021-08-16T15:43:46.680676841+08:00"
+    digest: 6bb7a65ba2f3c499a446aa11396d14a2fc7a9975002e5581c1640de3313ef22d
+    name: pvc-exporter
+    type: application
+    urls:
+    - pvc-exporter-0.1.1-fix.tgz
+    version: 0.1.1-fix
+generated: "2021-08-16T15:43:46.679422698+08:00"
