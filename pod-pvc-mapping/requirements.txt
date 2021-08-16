@@ -1,2 +1,2 @@
-kubernetes
-prometheus_client
+kubernetes==17.17.0
+prometheus_client==0.11.0
