@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 
 namespace: pvc-exporter
+createNamespace: true
 
 PodPvcMapping:
   image:
