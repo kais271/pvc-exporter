@@ -1,4 +1,4 @@
-{{- if .Values.createNamespace | default true }}
+{{- if or (kindIs "invalid" .Values.createNamespace) (.Values.createNamespace) }}
 apiVersion: v1
 kind: Namespace
 metadata:
