@@ -15,9 +15,9 @@ The following storage provisioners has been tested..
 5.iomesh  
 6.nutanix-csi
  
-# Install
-You can get the following files and run apply them.
-kubectl apply -f namespace.yml -f rbac.yml -f deployment.yml -f daemonset.yml -f servicemonitor.yml
+# Usage
+    helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/
+    helm install my-pvc-exporter pvc-exporter/pvc-exporter --version xxx
 
 # Grafana
 

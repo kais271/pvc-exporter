@@ -32,6 +32,13 @@ PodPvcMapping:
   - key: node-role.kubernetes.io/master
     effect: NoSchedule
 
+  resources:
+    limits:
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 200Mi
+
   livenessProbe:
     httpGet:
       path: /
@@ -41,6 +48,10 @@ PodPvcMapping:
     initialDelaySeconds: 5
     periodSeconds: 5
     successThreshold: 1
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
 
 BlockPvcScanner:
   image:
@@ -83,6 +94,10 @@ BlockPvcScanner:
     initialDelaySeconds: 5
     periodSeconds: 5
     successThreshold: 1
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
 
 serviceMonitor:
   enabled: true

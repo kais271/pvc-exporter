@@ -41,6 +41,10 @@ spec:
         - containerPort: {{.Values.PodPvcMapping.containerPort}}
           name: metrics
           protocol: TCP
+        resources:
+          {{- toYaml .Values.PodPvcMapping.resources | nindent 10 }}
         livenessProbe:
           {{- toYaml .Values.PodPvcMapping.livenessProbe | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.PodPvcMapping.securityContext | nindent 10 }}
       serviceAccountName: {{ $fullName }}-sa
