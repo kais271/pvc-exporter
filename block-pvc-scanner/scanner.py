@@ -4,7 +4,7 @@ import time
 import psutil
 from prometheus_client import start_http_server, Gauge
 
-g = Gauge('pvc_usage', 'fetching pvc usage matched by k8s csi', ['volumename'])
+g = Gauge('pvc_usage', "fetching pvc usage matched by k8s csi", ['volumename'])
 # set metrics
 start_http_server(8848)
 
@@ -23,7 +23,7 @@ while 1:
     all_mount_points = list(map(lambda p: p.mountpoint, filter(filter_supported_pvcs, psutil.disk_partitions())))
     if len(all_mount_points) == 0:
         print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
-              'Warning: Not found block storage pvc.')
+              "Warning: Not found block storage pvc.")
     for mount_point in all_mount_points:
         # get pvc name
         mount_point_parts = mount_point.split('/')
