@@ -42,7 +42,8 @@ while 1:
         g.labels(volume).set(pvc_usage)
         labels.add(volume)
 
-    g.remove(old_labels - labels)
+    for label in old_labels - labels:
+        g.remove(label)
     old_labels = labels
 
     time.sleep(15)
