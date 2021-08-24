@@ -28,7 +28,7 @@ while 1:
     labels = set()
     all_mount_points = list(map(lambda p: p.mountpoint, filter(filter_supported_pvcs, psutil.disk_partitions())))
     if len(all_mount_points) == 0:
-        logger.warning("Not found block storage pvc.")
+        logger.warning("No mounted PVC found.")
     for mount_point in all_mount_points:
         # get pvc name
         mount_point_parts = mount_point.split('/')
@@ -40,7 +40,7 @@ while 1:
                 volume = 'pvc' + possible_pvc.split('pvc')[-1]
 
         pvc_usage = psutil.disk_usage(mount_point).percent
-        logger.info(f'{volume}, {pvc_usage}')
+        logger.info(f'VOLUME: {volume}, USAGE: {pvc_usage}')
         g.labels(volume).set(pvc_usage)
         labels.add(volume)
 
