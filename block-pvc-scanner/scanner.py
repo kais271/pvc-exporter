@@ -34,7 +34,7 @@ while 1:
             elif gke_data_re.match(gke_pvc):
                 volume = 'pvc' + gke_pvc.split('pvc')[-1]
 
-        pvc_usage = psutil.disk_usage(mount_point)
+        pvc_usage = psutil.disk_usage(mount_point).percent
         print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), volume, pvc_usage)
         g.labels(volume).set(pvc_usage)
 
