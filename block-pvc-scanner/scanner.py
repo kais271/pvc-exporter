@@ -1,29 +1,41 @@
-import os,re,time
+import re
+import time
+
+import psutil
 from prometheus_client import start_http_server, Gauge
-g=Gauge('pvc_usage','fetching pvc usge matched by k8s csi',['volumename'])
-#set metrics
+
+g = Gauge('pvc_usage', 'fetching pvc usage matched by k8s csi', ['volumename'])
+# set metrics
 start_http_server(8848)
 
+supported_pvc_re = re.compile('^.+(kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts).*$')
+pvc_re = re.compile('^pvc')
+gke_data_re = re.compile('^gke-data')
+
+
+def filter_supported_pvcs(partition):
+    if supported_pvc_re.match(partition.mountpoint):
+        return True
+    return False
+
+
 while 1:
-  get_pvc=os.popen("df -h|grep -E 'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts'")
-  all_pvcs=get_pvc.readlines()
-  if(len(all_pvcs) == 0):
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'Warning: Not found block storage pvc.Or not supported yet.')
-  for pvc in all_pvcs:
-    #get pvc name
-    pvc_info=pvc.split(' ')
-    volume=pvc_info[-1].split('/')[-1]
-    for gke_pvc in pvc_info[-1].split('/'):
-      if re.match("^pvc",gke_pvc):
-        volume=gke_pvc
-      elif re.match("^gke-data",gke_pvc):
-        volume='pvc'+gke_pvc.split('pvc')[-1]
-     
-    for pvc_usage in pvc_info:
-      #get pvc usgae
-      if re.match("^[0-9]*\%",pvc_usage):
-        pvc_usage=float(pvc_usage.strip('%'))/100.0
-        print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), volume, pvc_usage)
+    all_mount_points = list(map(lambda p: p.mountpoint, filter(filter_supported_pvcs, psutil.disk_partitions())))
+    if len(all_mount_points) == 0:
+        print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
+              'Warning: Not found block storage pvc.')
+    for mount_point in all_mount_points:
+        # get pvc name
+        mount_point_parts = mount_point.split('/')
+        volume = mount_point_parts[-1]
+        for gke_pvc in mount_point_parts:
+            if pvc_re.match(gke_pvc):
+                volume = gke_pvc
+            elif gke_data_re.match(gke_pvc):
+                volume = 'pvc' + gke_pvc.split('pvc')[-1]
+
+        pvc_usage = psutil.disk_usage(mount_point)
+        print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), volume, pvc_usage)
         g.labels(volume).set(pvc_usage)
 
-  time.sleep(15)
+    time.sleep(15)

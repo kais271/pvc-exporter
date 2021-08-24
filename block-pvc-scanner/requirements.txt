@@ -1,2 +1,2 @@
-kubernetes==18.20.0
+psutil==5.8.0
 prometheus_client==0.11.0
