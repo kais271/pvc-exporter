@@ -1,10 +1,13 @@
 from kubernetes import client, config
 from prometheus_client import start_http_server, Gauge
 import time
+import logging
 start_http_server(8849)
 g=Gauge('pvc_mapping','fetching the mapping between pod and pvc',['persistentvolumeclaim','volumename','mountedby'])
 
 pool={}
+
+logger = logging.getLogger('pod_pvc_mapping')
 
 def get_items(obj):
   format=obj.to_dict()
@@ -31,7 +34,7 @@ while 1:
             if pvc['metadata']['name'] == mounted_pvc:
               vol_name=pvc['spec']['volume_name']
           #pod_name=po['metadata']['name']
-          print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),"Found --> NS: %s, PVC: %s, VOLUME: %s, POD: %s"%(ns,mounted_pvc,vol_name,pod_name))
+          logger.info(f'Found --> NS: {ns}, PVC: {mounted_pvc}, VOLUME: {vol_name}, POD: {pod_name}')
           if mounted_pvc in pool.keys():
           #update mapping
             g.remove(mounted_pvc,pool[mounted_pvc][0],pool[mounted_pvc][1])
@@ -41,5 +44,5 @@ while 1:
             g.labels(mounted_pvc,vol_name,pod_name)
             pool[mounted_pvc]=[vol_name,pod_name]
         else:
-          print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),'Not found mounted pvc on %s in namespace %s.'%(pod_name,ns))
+          logger.info(f'Not found mounted pvc on {pod_name} in namespace {ns}.')
   time.sleep(15)

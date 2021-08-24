@@ -1,8 +1,11 @@
+import logging
 import re
 import time
 
 import psutil
 from prometheus_client import start_http_server, Gauge
+
+logger = logging.getLogger('block_pvc_scanner')
 
 g = Gauge('pvc_usage', "fetching pvc usage matched by k8s csi", ['volumename'])
 # set metrics
@@ -25,8 +28,7 @@ while 1:
     labels = set()
     all_mount_points = list(map(lambda p: p.mountpoint, filter(filter_supported_pvcs, psutil.disk_partitions())))
     if len(all_mount_points) == 0:
-        print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
-              "Warning: Not found block storage pvc.")
+        logger.warning("Not found block storage pvc.")
     for mount_point in all_mount_points:
         # get pvc name
         mount_point_parts = mount_point.split('/')
@@ -38,7 +40,7 @@ while 1:
                 volume = 'pvc' + possible_pvc.split('pvc')[-1]
 
         pvc_usage = psutil.disk_usage(mount_point).percent
-        print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), volume, pvc_usage)
+        logger.info(f'{volume}, {pvc_usage}')
         g.labels(volume).set(pvc_usage)
         labels.add(volume)
 
