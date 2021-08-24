@@ -19,7 +19,10 @@ def filter_supported_pvcs(partition):
     return False
 
 
+old_labels = set()
+
 while 1:
+    labels = set()
     all_mount_points = list(map(lambda p: p.mountpoint, filter(filter_supported_pvcs, psutil.disk_partitions())))
     if len(all_mount_points) == 0:
         print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
@@ -37,5 +40,9 @@ while 1:
         pvc_usage = psutil.disk_usage(mount_point).percent
         print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), volume, pvc_usage)
         g.labels(volume).set(pvc_usage)
+        labels.add(volume)
+
+    g.remove(old_labels - labels)
+    old_labels = labels
 
     time.sleep(15)
