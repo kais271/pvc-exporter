@@ -31,11 +31,11 @@ while 1:
         # get pvc name
         mount_point_parts = mount_point.split('/')
         volume = mount_point_parts[-1]
-        for gke_pvc in mount_point_parts:
-            if pvc_re.match(gke_pvc):
-                volume = gke_pvc
-            elif gke_data_re.match(gke_pvc):
-                volume = 'pvc' + gke_pvc.split('pvc')[-1]
+        for possible_pvc in mount_point_parts:
+            if pvc_re.match(possible_pvc):
+                volume = possible_pvc
+            elif gke_data_re.match(possible_pvc):
+                volume = 'pvc' + possible_pvc.split('pvc')[-1]
 
         pvc_usage = psutil.disk_usage(mount_point).percent
         print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), volume, pvc_usage)
