@@ -7,7 +7,12 @@ g=Gauge('pvc_mapping','fetching the mapping between pod and pvc',['persistentvol
 
 pool={}
 
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('pod_pvc_mapping')
+logger.setLevel(logging.DEBUG)
+print_log = logging.StreamHandler()
+print_log.setFormatter(formatter)
+logger.addHandler(print_log)
 
 def get_items(obj):
   format=obj.to_dict()
