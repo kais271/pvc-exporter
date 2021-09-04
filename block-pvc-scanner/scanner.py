@@ -5,7 +5,12 @@ import time
 import psutil
 from prometheus_client import start_http_server, Gauge
 
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('block_pvc_scanner')
+logger.setLevel(logging.DEBUG)
+print_log = logging.StreamHandler()
+print_log.setFormatter(formatter)
+logger.addHandler(print_log)
 
 g = Gauge('pvc_usage', "fetching pvc usage matched by k8s csi", ['volumename'])
 # set metrics
