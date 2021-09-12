@@ -27,7 +27,7 @@ def get_pv_usage(pvc_info):
 while 1:
   get_pvc=os.popen("df -h|grep -E 'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts'")
   all_pvcs=get_pvc.readlines()
-  if(len(all_pvcs) == 0):
+  if len(all_pvcs) == 0:
     logger.warning("No block storage pvc found or not supported yet.")
   else:
     for pvc in all_pvcs:

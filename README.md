@@ -22,5 +22,5 @@ The following storage provisioners has been tested..
 # Grafana
 
 You can import the pvc_usage-dashboard to grafana to monitor pvc usage.
-![grafana-1](./images/grafana-1.PNG)
+![grafana-1](./png/grafana-1.PNG)
 The format for legend is pod:pvc.
