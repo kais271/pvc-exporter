@@ -19,7 +19,7 @@ PodPvcMapping:
   service:
     headless: false
     ## If PodPvcMapping.service.headless=true, then ignore type
-    type: NodePort
+    type: ClusterIP
     port: 8849
     labels: {}
     annotations: {}
@@ -65,7 +65,7 @@ BlockPvcScanner:
   service:
     headless: false
     ## If BlockPvcScanner.service.headless=true, then ignore type
-    type: NodePort
+    type: ClusterIP
     port: 8848
     labels: {}
     annotations: {}
