@@ -4,7 +4,7 @@ import time
 import logging
 import traceback
 
-start_http_server(8859)
+start_http_server(8849)
 g=Gauge('pvc_mapping','fetching the mapping between pod and pvc',['persistentvolumeclaim','volumename','mountedby','namespace'])
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
