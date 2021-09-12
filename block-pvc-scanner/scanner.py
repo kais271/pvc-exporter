@@ -33,14 +33,14 @@ while 1:
     for pvc in all_pvcs:
       #get pvc name
       pvc_info=pvc.split(' ')
-      volume=pvc_info[-1].split('/')[-1]
-      if re.match("^pvc",volume):
-        pv=volume
-        get_pv_usage(pvc_info)
-      elif re.match("^gke-data",volume):
-        pv='pvc'+volume.split('pvc')[-1]
-        get_pv_usage(pvc_info)
-      else:
-        logger.error(f'Canot match this volume: {volume}')
+      for volume in pvc_info[-1].split('/'):
+        if re.match("^pvc",volume):
+          pv=volume
+          get_pv_usage(pvc_info)
+        elif re.match("^gke-data",volume):
+          pv='pvc'+volume.split('pvc')[-1]
+          get_pv_usage(pvc_info)
+        elif 'pvc' in volume:
+          logger.error(f'Canot match this volume: {volume}')
   logger.info("Will sleep 15s...")
   time.sleep(15)
