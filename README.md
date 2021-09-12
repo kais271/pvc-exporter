@@ -13,7 +13,12 @@ The following storage provisioners has been tested..
 3.rook-ceph  
 4.aliyun flexvolume  
 5.iomesh  
-6.nutanix-csi
+6.nutanix-csi  
+
+The following architecture:  
+1.x86_64  
+2.ARM64  
+
  
 # Usage
     helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/
