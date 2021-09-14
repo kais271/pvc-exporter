@@ -28,4 +28,3 @@ The following architecture:
 
 You can import the pvc_usage-dashboard.json to grafana to monitor pvc usage.
 ![grafana-1](./docs/grafana.png)
-The format for legend is pod:pvc.
