@@ -26,6 +26,6 @@ The following architecture:
 
 # Grafana
 
-You can import the pvc_usage-dashboard to grafana to monitor pvc usage.
-![grafana-1](./png/grafana-1.PNG)
+You can import the pvc_usage-dashboard.json to grafana to monitor pvc usage.
+![grafana-1](./docs/grafana.png)
 The format for legend is pod:pvc.
