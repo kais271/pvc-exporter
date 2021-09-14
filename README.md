@@ -22,7 +22,7 @@ The following architecture:
  
 # Usage
     helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/
-    helm install my-pvc-exporter pvc-exporter/pvc-exporter --version xxx
+    helm install demo pvc-exporter/pvc-exporter --version v0.1.2-beta
 
 # Grafana
 
