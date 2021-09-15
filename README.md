@@ -26,5 +26,5 @@ The following architecture:
 
 # Promethesus & Grafana
 
-You can use this expression **(sum without (container,pod,service,namespace,job,instance,endpoint) (pvc_usage)) + on(volumename) group_left(persistentvolumeclaim,mountedby,pod_namespace)pvc_mapping*0** to grafana to monitor pvc usage.  
+You can use this expression **" (sum without (container,pod,service,namespace,job,instance,endpoint) (pvc_usage)) + on(volumename) group_left(persistentvolumeclaim,mountedby,pod_namespace)pvc_mapping*0 "** to grafana to monitor pvc usage.  
 ![grafana-1](./docs/grafana.png)
