@@ -4,7 +4,7 @@ import time
 import logging
 
 from prometheus_client import start_http_server, Gauge
-g=Gauge('pv_usage','fetching pvc usge matched by k8s csi',['volumename'])
+g=Gauge('pvc_usage','fetching pvc usge matched by k8s csi',['volumename'])
 #set metrics
 start_http_server(8848)
 
