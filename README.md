@@ -4,7 +4,8 @@
 This item provides 2 metrics,one for monitoring mounted pvc usage named **pvc_usage**, and one for provides the mapping between pod and pvc named **pvc_mapping**.
 
 # Note
-Only used to monitor mounted pvc that provied by block storage provisioner. Such as longgorn,trident,rook-ceph,etc..
+This project just can monitoring mounted pvc that provied by block storage provisioner and mounted as **"volumeMounts"**. Such as longgorn,trident,rook-ceph,etc..  
+In addition, if your pv is block model and mounted as **"volumeDevices"** that not supported yet. 
 
 # Support list
 The following storage provisioners has been tested..  
