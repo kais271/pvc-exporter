@@ -2,8 +2,17 @@ apiVersion: v1
 entries:
   pvc-exporter:
   - apiVersion: v2
+    appVersion: 0.1.2
+    created: "2021-09-21T10:53:58.640593384+08:00"
+    digest: ded5c7db67242d192bd490c554d755bac1d8befd85fe0d23ebff67f839a5a643
+    name: pvc-exporter
+    type: application
+    urls:
+    - pvc-exporter-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
     appVersion: 0.1.2-beta
-    created: "2021-09-14T17:54:34.589604541+08:00"
+    created: "2021-09-21T10:53:58.639931281+08:00"
     digest: 2ce3e760dbf6af11dd6906bcdd1ef43f1659f5b11a7f9eba1150391530b995e4
     name: pvc-exporter
     type: application
@@ -12,7 +21,7 @@ entries:
     version: 0.1.2-beta
   - apiVersion: v2
     appVersion: 0.1.2-alpha
-    created: "2021-09-14T17:54:34.586848748+08:00"
+    created: "2021-09-21T10:53:58.639285607+08:00"
     digest: f57fa9c2c324235cd4d488db2ee9ba06df8ea64451f0581e256b25c7e2a5ba2c
     name: pvc-exporter
     type: application
@@ -21,7 +30,7 @@ entries:
     version: 0.1.2-alpha
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2021-09-14T17:54:34.585502542+08:00"
+    created: "2021-09-21T10:53:58.638584941+08:00"
     digest: be035aedba12f50efbbdb394b4ae905249830a52c4d4ddd3f33d2ee89b3df54a
     name: pvc-exporter
     type: application
@@ -30,11 +39,11 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 0.1.1-fix
-    created: "2021-09-14T17:54:34.58478446+08:00"
+    created: "2021-09-21T10:53:58.638055388+08:00"
     digest: 6bb7a65ba2f3c499a446aa11396d14a2fc7a9975002e5581c1640de3313ef22d
     name: pvc-exporter
     type: application
     urls:
     - pvc-exporter-0.1.1-fix.tgz
     version: 0.1.1-fix
-generated: "2021-09-14T17:54:34.581072213+08:00"
+generated: "2021-09-21T10:53:58.637063255+08:00"

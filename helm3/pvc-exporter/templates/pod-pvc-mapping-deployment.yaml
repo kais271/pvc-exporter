@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ $fullName }}-pod-pvc-mapping
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     app: {{ $fullName }}
     com: {{ $fullName }}-pod-pvc-mapping

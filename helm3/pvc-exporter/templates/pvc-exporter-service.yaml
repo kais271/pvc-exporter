@@ -13,7 +13,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   name: {{ $fullName }}-block-pvc-scanner
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.Namespace}}
 spec:
   ports:
   - port: {{.Values.BlockPvcScanner.service.port}}

@@ -22,8 +22,9 @@ The following architecture:
 
  
 # Usage
-    helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/
-    helm install demo pvc-exporter/pvc-exporter --version v0.1.2-beta
+    helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/  
+    kubectl create namespace pvc-exporter  
+    helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.2
 
 # Promethesus & Grafana
 

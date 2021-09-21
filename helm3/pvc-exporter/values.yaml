@@ -2,16 +2,13 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-namespace: pvc-exporter
-createNamespace: true
 
 PodPvcMapping:
   image:
     repository: dockerid31415926/pod-pvc-mapping
-    tag: v0.1.2-beta
+    tag: v0.1.2
     pullPolicy: IfNotPresent
-    pullSecrets:
-      - name: regsecret
+    pullSecrets: []
 
   replicaCount: 1
   
@@ -56,10 +53,9 @@ PodPvcMapping:
 BlockPvcScanner:
   image:
     repository: dockerid31415926/block-pvc-scanner
-    tag: v0.1.2-beta
+    tag: v0.1.2
     pullPolicy: IfNotPresent
-    pullSecrets:
-      - name: regsecret
+    pullSecrets: []
 
   containerPort: 8848
   service:

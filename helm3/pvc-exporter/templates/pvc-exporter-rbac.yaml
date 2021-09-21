@@ -30,10 +30,10 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ $fullName }}-sa
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.Namespace}}
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: {{ $fullName }}-sa
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.Namespace}}
