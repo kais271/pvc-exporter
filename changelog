@@ -1,0 +1,5 @@
+v0.1.2
+1.Add logging to record some info
+2.Update base image
+3.Rewrite pod-pvc-mapping
+4.Modify charts
