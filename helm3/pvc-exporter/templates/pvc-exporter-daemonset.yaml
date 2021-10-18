@@ -1,0 +1,68 @@
+{{- $fullName := include "pvc-exporter.fullname" . -}}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ $fullName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ $fullName }}
+    version: {{ .Chart.AppVersion }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ $fullName }}
+      version: {{ .Chart.AppVersion }}
+  template:
+    metadata:
+      labels:
+        app: {{ $fullName }}
+        version: {{ .Chart.AppVersion }}
+    spec:
+      imagePullSecrets:
+{{ toYaml .Values.PvcExporter.image.pullSecrets | indent 8 }}
+      containers:
+      - name: pvc-exporter
+        {{- if .Values.PvcExporter.image.sha }}
+        image: "{{ .Values.PvcExporter.image.repository }}:{{ .Values.PvcExporter.image.tag }}@sha256:{{ .Values.PvcExporter.image.sha }}"
+        {{- else }}
+        image: "{{ .Values.PvcExporter.image.repository }}:{{ .Values.PvcExporter.image.tag }}"
+        {{- end }}
+        imagePullPolicy: "{{ .Values.PvcExporter.image.pullPolicy }}"
+        env:
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+{{ toYaml .Values.PvcExporter.env | indent 8 }}
+        ports:
+        - containerPort: {{ .Values.PvcExporter.containerPort }}
+          name: metrics
+          protocol: TCP
+        resources:
+{{ toYaml .Values.PvcExporter.resources | indent 10 }}
+        volumeMounts:
+        - name: host-root
+          mountPath: /host
+          readOnly: true
+        livenessProbe:
+{{ toYaml .Values.PvcExporter.livenessProbe | indent 10 }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+      volumes:
+      - name: host-root
+        hostPath:
+          path: /
+      serviceAccountName: {{ $fullName }}-sa
+    {{- with .Values.PvcExporter.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.PvcExporter.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.PvcExporter.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

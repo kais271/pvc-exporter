@@ -4,27 +4,27 @@ kind: Service
 metadata:
   labels:
     app: {{ $fullName }}
-    com: {{ $fullName }}-block-pvc-scanner
-    {{- with .Values.BlockPvcScanner.service.labels }}
-    {{- toYaml . | nindent 4 }}
+    version: {{ .Chart.AppVersion }}
+    {{- with .Values.PvcExporter.service.labels }}
+{{ toYaml . | indent 4 }}
     {{- end }}
-  {{- with .Values.BlockPvcScanner.service.annotations }}
+  {{- with .Values.PvcExporter.service.annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
+{{ toYaml . | indent 4 }}
   {{- end }}
-  name: {{ $fullName }}-block-pvc-scanner
+  name: {{ $fullName }}
   namespace: {{.Release.Namespace}}
 spec:
   ports:
-  - port: {{.Values.BlockPvcScanner.service.port}}
+  - port: {{.Values.PvcExporter.service.port}}
     name: metrics
     protocol: TCP
-    targetPort: {{.Values.BlockPvcScanner.containerPort}}
+    targetPort: {{.Values.PvcExporter.containerPort}}
   selector:
     app: {{ $fullName }}
-    com: {{ $fullName }}-block-pvc-scanner
-  {{- if .Values.BlockPvcScanner.service.headless }}
+    version: {{ .Chart.AppVersion }}
+  {{- if .Values.PvcExporter.service.headless }}
   clusterIP: None
   {{- else }}
-  type: {{.Values.BlockPvcScanner.service.type }}
+  type: {{.Values.PvcExporter.service.type }}
   {{- end }}

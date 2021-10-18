@@ -12,6 +12,7 @@ spec:
   selector:
     matchLabels:
       app: {{ $fullName }}
+      version: {{ .Chart.AppVersion }}
   endpoints:
   - interval: 30s
     targetPort: metrics
