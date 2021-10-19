@@ -4,11 +4,16 @@
 ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pvc-exporter?color=green&label=pvc-exporter)
 ![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pvc-exporter?color=green)  
 
-This item provides 2 metrics,one for monitoring mounted pvc usage named **"pvc_usage"**, and one for provides the mapping between pod and pvc named **"pvc_mapping"**.
+This project provides 2 metrics,one for monitoring mounted pvc usage named **"pvc_usage"**, and one for provides the mapping between pod and pvc named **"pvc_mapping"**.
 
-# Note
-This project just can monitoring mounted pvc that provied by block storage provisioner and mounted as **"volumeMounts"**. Such as longgorn,trident,rook-ceph,etc..  
-In addition, if your pv is block model and mounted as **"volumeDevices"** that not supported yet. 
+# Note  
+The hostpath pvc and nfs pvc will be supported starting with version 0.1.3.  
+This exporter now supports 3 types of pvc: hostpath, nfs, blockstorage.  
+For blockstorage just supported the pvc mounted as **"volumeMounts"**. Such as longgorn,trident,rook-ceph,etc..If your pv is block model and mounted as **"volumeDevices"** that not supported yet. 
+
+**Architecture Change:**  
+Previously, **"pvc_usage"** and **"pvc_mapping"** were divided into 2 images. Now, they have merged into one image.  
+So if you want to upgrade to v0.1.3, we recommend that you uninstall old version then install new version.  
 
 # Support list
 The following storage provisioners has been tested..  
@@ -18,8 +23,9 @@ The following storage provisioners has been tested..
 4.aliyun flexvolume  
 5.iomesh  
 6.nutanix-csi  
+...  
 
-The following architecture:  
+The following architectures:  
 1.x86_64  
 2.ARM64  
 
