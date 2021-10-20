@@ -49,4 +49,4 @@ pvc_mapping{**container**="pvc-exporter", **endpoint**="metrics", **host_ip**="1
 
 You can use this expression **" (sum without (container,pod,service,namespace,job,instance,endpoint,pvc_namespace,pvc_requested_size_MB) (pvc_usage)) + on(persistentvolume) group_left(persistentvolumeclaim,mountedby,pod_namespace)pvc_mapping*0 "** to grafana to monitoring pvc usage.  
 **note!!!** You can see one pvc usage percent more than 1, that's a nfs pvc. As we know the nfs and hostpath pvc will exceed the requested size if the provisioner not support quota.  
-![grafana-1](./docs/grafana.png)
+![grafana-1](./docs/grafana-1.png)
