@@ -1,6 +1,12 @@
 # pvc-exporter
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/pvc-exporter)](https://artifacthub.io/packages/search?repo=pvc-exporter)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/pvc-exporter)](https://artifacthub.io/packages/search?repo=pvc-exporter)  
+**As of v0.1.2**  
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/block-pvc-scanner?label=block-pvc-scanner)
+![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/block-pvc-scanner)
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pod-pvc-mapping?color=green&label=pod-pvc-mapping)
+![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pod-pvc-mapping?color=green)  
+**Since v0.1.3**  
 ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pvc-exporter?color=green&label=pvc-exporter)
 ![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pvc-exporter?color=green)  
 
