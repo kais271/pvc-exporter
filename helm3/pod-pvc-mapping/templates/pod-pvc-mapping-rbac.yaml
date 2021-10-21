@@ -1,0 +1,39 @@
+{{- $fullName := include "pod-pvc-mapping.fullname" . -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ $fullName }}-cr
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - 'get'
+  - 'list'
+  - 'watch'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - 'get'
+  - 'list'
+  - 'watch'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ $fullName }}-crbinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ $fullName }}-cr
+subjects:
+- kind: ServiceAccount
+  name: {{ $fullName }}-sa
+  namespace: {{.Release.Namespace}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $fullName }}-sa
+  namespace: {{.Release.Namespace}}

@@ -14,7 +14,7 @@ start_http_server(EXPORTER_SERVER_PORT)
 #start metrics server
 
 metric_pvc_usage=Gauge('pvc_usage','The value is PVC usage percent that equal to pvc_used_MB/pvc_requested_size_MB',
-['persistentvolumeclaim','persistentvolume','pvc_namespace','pvc_used_MB','pvc_requested_size_MB','pvc_type'])
+['persistentvolumeclaim','persistentvolume','pvc_namespace','pvc_used_MB','pvc_requested_size_MB','pvc_requested_size_human','pvc_type'])
 metric_pvc_mapping=Gauge('pvc_mapping','Fetching the mapping between pvc and pod',
 ['persistentvolumeclaim','persistentvolume','mountedby','pod_namespace','host_ip'])
 
@@ -167,8 +167,8 @@ while 1:
                     #pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip]
                     if id_key in pool.keys():
                     #update mapping
-                      metric_pvc_usage.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][4],pool[id_key][2],pool[id_key][6])
-                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_type).set(pvc_used_percent)
+                      metric_pvc_usage.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][4],pool[id_key][2],pool[id_key][3],pool[id_key][6])
+                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type).set(pvc_used_percent)
                       #['persistentvolumeclaim','persistentvolume','pvc_namespace','pvc_used_MB'
                       metric_pvc_mapping.remove(pool[id_key][0],pool[id_key][1],pool[id_key][7],pool[id_key][8],pool[id_key][9])
                       metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip)
@@ -185,7 +185,7 @@ while 1:
                       #8-ns
                       #9-host_ip
                     else:
-                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_type).set(pvc_used_percent)
+                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type).set(pvc_used_percent)
                       metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip)
                       pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip]
 
