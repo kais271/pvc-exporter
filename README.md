@@ -7,19 +7,21 @@
 ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pod-pvc-mapping?color=green&label=pod-pvc-mapping)
 ![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pod-pvc-mapping?color=green)  
 **Since v0.1.3**  
-![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pvc-exporter?color=green&label=pvc-exporter)
-![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pvc-exporter?color=green)  
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pvc-exporter?label=pvc-exporter)
+![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pvc-exporter)  
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pod-pvc-mapping?color=green&label=pod-pvc-mapping)
+![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pod-pvc-mapping?color=green)  
 
 This project provides 2 metrics,one for monitoring mounted pvc usage named **"pvc_usage"**, and one for provides the mapping between pod and pvc named **"pvc_mapping"**.
 
 # Note  
-The hostpath pvc and nfs pvc will be supported starting with version 0.1.3.  
-This exporter now supports 3 types of pvc: hostpath, nfs, blockstorage.  
-For blockstorage just supported the pvc mounted as **"volumeMounts"**. Such as longgorn,trident,rook-ceph,etc..If your pv is block model and mounted as **"volumeDevices"** that not supported yet. 
+Now, the hostpath pvc and nfs pvc will be supported starting with version 0.1.3. So we currently support 3 types of pvc: hostpath, nfs, blockstorage.  
+For blockstorage just supported the pvc mounted as **"volumeMounts"**. If your pv is block model and mounted as **"volumeDevices"** that not supported yet. 
 
 **Architecture Change:**  
-Previously, **"pvc_usage"** and **"pvc_mapping"** were divided into 2 images. Now, they have merged into one image. In addition, the field of the metrics have also been changed.   
-So if you want to upgrade to v0.1.3, we recommend that you uninstall old version then install new version.  
+1. Previously, **"pvc_usage"** and **"pvc_mapping"** were divided into 2 images. Now, they have merged into one image, called **pvc-exporter**. In addition, the field of the metrics have also been changed.   
+2. Based on the development of k8s, the native metrics like **kubelet_volume_stats_used_bytes** was now well enough to work normally. So the **pod-pvc-mapping** project is maintained separately now. You can use this alone with the native metrics to monitoring pvc.  
+3. If you want to upgrade to v0.1.3, we recommend that you uninstall old version then install new version.  
 
 # Support list
 The following storage provisioners has been tested..  
