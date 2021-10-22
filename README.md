@@ -39,9 +39,16 @@ The following architectures:
 
  
 # Usage
+    #This will be provide 2 metrics: pvc_usage and pvc_mapping 
     helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/  
     kubectl create namespace pvc-exporter  
-    helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.2
+    helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.3-alpha  
+
+    #If you just want to get pvc_mapping:  
+    helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/
+    kubectl create namespace pod-pvc-mapping
+    helm install demo pvc-exporter/pod-pvc-mapping--namespace pod-pvc-mapping --version v0.1.3-alpha  
+    
 # Metrics Examples  
 **#pvc_usage**  
 The value is pvc usage percent that equal pvc_used_MB/pvc_requested_MB. Some informations about pvc is also provided.  
