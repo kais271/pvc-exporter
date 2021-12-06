@@ -42,12 +42,12 @@ The following architectures:
     #This will be provide 2 metrics: pvc_usage and pvc_mapping 
     helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/  
     kubectl create namespace pvc-exporter  
-    helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.3-alpha  
+    helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.3-beta  
 
     #If you just want to get pvc_mapping:  
     helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/
     kubectl create namespace pod-pvc-mapping
-    helm install demo pvc-exporter/pod-pvc-mapping--namespace pod-pvc-mapping --version v0.1.3-alpha  
+    helm install demo pvc-exporter/pod-pvc-mapping--namespace pod-pvc-mapping --version v0.1.3-beta  
     
 # Metrics Examples  
 **#pvc_usage**  
