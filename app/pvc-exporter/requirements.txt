@@ -1,2 +1,2 @@
-kubernetes==18.20.0
-prometheus_client==0.11.0
+kubernetes==19.15.0
+prometheus_client==0.12.0

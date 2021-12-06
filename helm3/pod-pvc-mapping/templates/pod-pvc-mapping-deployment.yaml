@@ -37,6 +37,8 @@ spec:
         image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
         imagePullPolicy: {{ .pullPolicy }}
         {{- end }}
+        env:
+{{ toYaml .Values.PvcExporter.env | indent 8 }}
         ports:
         - containerPort: {{.Values.PodPvcMapping.containerPort}}
           name: metrics

@@ -10,15 +10,16 @@ EXPORTER_SERVER_PORT=int(os.getenv('EXPORTER_SERVER_PORT'))
 SCAN_INTERVAL=float(os.getenv('SCAN_INTERVAL'))
 HOST_IP=os.getenv('HOST_IP')
 
-start_http_server(EXPORTER_SERVER_PORT)
 #start metrics server
+start_http_server(EXPORTER_SERVER_PORT)
 
+#Provide 2 metric: pvc_usage, pvc_mapping
 metric_pvc_usage=Gauge('pvc_usage','The value is PVC usage percent that equal to pvc_used_MB/pvc_requested_size_MB',
 ['persistentvolumeclaim','persistentvolume','pvc_namespace','pvc_used_MB','pvc_requested_size_MB','pvc_requested_size_human','pvc_type'])
 metric_pvc_mapping=Gauge('pvc_mapping','Fetching the mapping between pvc and pod',
 ['persistentvolumeclaim','persistentvolume','mountedby','pod_namespace','host_ip'])
 
-
+#Initialize the logging
 formatter=logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger=logging.getLogger('pvc-exporter')
 logger.setLevel(logging.DEBUG)
@@ -26,7 +27,6 @@ print_log=logging.StreamHandler()
 print_log.setFormatter(formatter)
 logger.addHandler(print_log)
 
-pool={}
 
 def get_items(obj):
   #format api response
@@ -72,7 +72,10 @@ def unit_conversion(size):
 
 
 def get_pvc_used(pv_info,MB_size):
-  #only support host_path and nfs, return percent##
+  '''
+  Get pvc usage.
+  The method is to mount the host path to the container, and then get the information.
+  '''
   pv_name=pv_info.metadata.name
   if pv_info.spec.nfs:
     #Get nfs pvc
@@ -85,25 +88,19 @@ def get_pvc_used(pv_info,MB_size):
     pvc_used=os.popen(get_pvc_used).readlines()[0].split('\t')[0]
     pvc_used_percent=round(float(pvc_used)/MB_size,2)
     pvc_type='nfs'
-
   elif pv_info.spec.host_path:
     #Get hostpat pvc
     host_pv_path=pv_info.spec.host_path.path
     fs_path='/host'+host_pv_path
     get_pvc_used="du -sm %s"%(fs_path)
-    print(get_pvc_used)
     pvc_used=os.popen(get_pvc_used).readlines()[0].split('\t')[0]
     pvc_used_percent=round(float(pvc_used)/MB_size,2)
     pvc_type='hostpath'
-
   else:
     #Get block PVC
-    print('block pvc .................')
     get_pvc_used="df -h|grep -E 'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts'|grep '%s'"%(pv_name)
-    #print(get_pvc_used)
     try:
       returned_fs_info=os.popen(get_pvc_used).readlines()[0].split()
-      print(returned_fs_info[0])
       if returned_fs_info[3].find('%') > 0:
         human_size,MB_size=unit_conversion(returned_fs_info[1])
         pvc_used=MB_size
@@ -114,9 +111,15 @@ def get_pvc_used(pv_info,MB_size):
       traceback.print_exc()
   return pvc_used,pvc_used_percent,pvc_type
 
-
-
-
+pool={}
+'''
+Maintain a resource pool that for update the mapping between pvc and pod.
+PVC --> POD:
+  One-to-One
+  One-to-Many
+  Many-to-One
+  Many-to-Many
+'''
 
 while 1:
   config.load_incluster_config()
@@ -144,7 +147,7 @@ while 1:
         pod_name=po['metadata']['name']
         pod_host_ip=k8s_api_obj.read_namespaced_pod(pod_name,ns).status.host_ip
         if pod_host_ip == HOST_IP:
-          ###if this pod on current host, then try to get pod info
+          #if this pod on current host, then try to get pod info
           try:
             for vol in po['spec']['volumes']:
             #find pvc in pod
@@ -153,6 +156,7 @@ while 1:
                 for pvc in pool_pvc[ns]:
                 #mapping pvc to pv
                   if mounted_pvc in pvc.keys():
+                    #Confirm pvc again
                     pv_name=pvc[mounted_pvc][0]
                     size=pvc[mounted_pvc][1]
                     pvc_requested_size_human,pvc_requested_size_MB=unit_conversion(size)
@@ -160,30 +164,27 @@ while 1:
                     pv_info=k8s_api_obj.read_persistent_volume(pv_name)
                     pvc_used_MB,pvc_used_percent,pvc_type=get_pvc_used(pv_info,pvc_requested_size_MB)
                     logger.info(f'Found --> NS: {ns}, PVC: {mounted_pvc}, PV: {pv_name}, PVC_TYPE: {pvc_type}, POD: {pod_name}, HOST_IP: {host_ip}, SIZE: {pvc_requested_size_MB}, USED: {pvc_used_MB}, PERCENT: {pvc_used_percent}')
-                    
-                    #expose metrics
-
+                    '''
+                    Start to set metrics values and updating the mapping.
+                    Index for pool:
+                      0-mounted_pvc
+                      1-pv_name
+                      2-pvc_requested_size_MB
+                      3-pvc_requested_size_human
+                      4-pvc_used_MB
+                      5-pvc_used_percent
+                      6-pvc_type
+                      7-pod_name
+                      8-ns
+                      9-host_ip
+                    '''
                     id_key=mounted_pvc+'-'+ns
-                    #pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip]
                     if id_key in pool.keys():
-                    #update mapping
                       metric_pvc_usage.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][4],pool[id_key][2],pool[id_key][3],pool[id_key][6])
                       metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type).set(pvc_used_percent)
-                      #['persistentvolumeclaim','persistentvolume','pvc_namespace','pvc_used_MB'
                       metric_pvc_mapping.remove(pool[id_key][0],pool[id_key][1],pool[id_key][7],pool[id_key][8],pool[id_key][9])
                       metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip)
-                      #persistentvolumeclaim','persistentvolume','mountedby','pvc_type','pod_namespace
                       pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip]
-                      #0-mounted_pvc
-                      #1-pv_name
-                      #2-pvc_requested_size_MB
-                      #3-pvc_requested_size_human
-                      #4-pvc_used_MB
-                      #5-pvc_used_percent
-                      #6-pvc_type
-                      #7-pod_name
-                      #8-ns
-                      #9-host_ip
                     else:
                       metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type).set(pvc_used_percent)
                       metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip)

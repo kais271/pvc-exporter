@@ -1,10 +1,13 @@
 from kubernetes import client, config
 from prometheus_client import start_http_server, Gauge
 import time
+import os
 import logging
 import traceback
 
-start_http_server(8849)
+EXPORTER_SERVER_PORT=int(os.getenv('EXPORTER_SERVER_PORT'))
+
+start_http_server(EXPORTER_SERVER_PORT)
 g=Gauge('pvc_mapping','fetching the mapping between pod and pvc',['persistentvolumeclaim','volumename','mountedby','pod_namespace'])
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
