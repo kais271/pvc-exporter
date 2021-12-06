@@ -2,11 +2,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $fullName }}-pod-pvc-mapping
+  name: {{ $fullName }}
   namespace: {{.Release.Namespace}}
   labels:
     app: {{ $fullName }}
-    com: {{ $fullName }}-pod-pvc-mapping
+    version: {{ .Chart.AppVersion }}
 spec:
   replicas: {{ .Values.PodPvcMapping.replicaCount }}
   strategy:
@@ -14,12 +14,12 @@ spec:
   selector:
     matchLabels:
       app: {{ $fullName }}
-      com: {{ $fullName }}-pod-pvc-mapping
+      version: {{ .Chart.AppVersion }}
   template:
     metadata:
       labels:
         app: {{ $fullName }}
-        com: {{ $fullName }}-pod-pvc-mapping
+        version: {{ .Chart.AppVersion }}
     spec:
       imagePullSecrets:
         {{- toYaml .Values.PodPvcMapping.image.pullSecrets | nindent 8 }}
@@ -38,7 +38,7 @@ spec:
         imagePullPolicy: {{ .pullPolicy }}
         {{- end }}
         env:
-{{ toYaml .Values.PvcExporter.env | indent 8 }}
+{{ toYaml .Values.PodPvcMapping.env | indent 8 }}
         ports:
         - containerPort: {{.Values.PodPvcMapping.containerPort}}
           name: metrics
