@@ -100,11 +100,14 @@ def get_pvc_used(pv_info,MB_size):
     #Get block PVC
     get_pvc_used="df -h|grep -E 'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts'|grep '%s'"%(pv_name)
     try:
-      returned_fs_info=os.popen(get_pvc_used).readlines()[0].split()
-      if returned_fs_info[3].find('%') > 0:
-        human_size,MB_size=unit_conversion(returned_fs_info[1])
+      returned_fs_info=os.popen(get_pvc_used).readlines()
+      for size_info in returned_fs_info:
+        if re.search("\d%",size_info):
+          returned_fs_size_info=size_info.split()
+      if returned_fs_size_info[3].find('%') > 0:
+        human_size,MB_size=unit_conversion(returned_fs_size_info[1])
         pvc_used=MB_size
-        pvc_used_percent=round(float(returned_fs_info[3].strip('%'))/100,2)
+        pvc_used_percent=round(float(returned_fs_size_info[3].strip('%'))/100,2)
         pvc_type='block'
     except:
       logger.error(f'Cannot resovle this pv {pv_name}')
