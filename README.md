@@ -20,7 +20,7 @@ For blockstorage just supported the pvc mounted as **"volumeMounts"**. If your p
 
 **Architecture Change:**  
 1. Previously, **"pvc_usage"** and **"pvc_mapping"** were divided into 2 images. Now, they have merged into one image, called **pvc-exporter**. In addition, the field of the metrics have also been changed.   
-2. Based on the development of k8s, the native metrics like **kubelet_volume_stats_used_bytes** was now well enough to work normally. So the **pod-pvc-mapping** project is maintained separately now. You can use this alone with the native metrics to monitoring pvc.  
+2. Based on the development of k8s, the native metrics like **kubelet_volume_stats_used_bytes** was now able to work normally and part of the demand has been met. So the **pod-pvc-mapping** project is maintained separately now, you can use this alone with the native metrics to monitoring pvc.  
 3. If you want to upgrade to v0.1.3, we recommend that you uninstall old version then install new version.  
 
 # Support list
@@ -52,16 +52,16 @@ The following architectures:
 # Metrics Examples  
 **#pvc_usage**  
 The value is pvc usage percent that equal pvc_used_MB/pvc_requested_MB. Some informations about pvc is also provided.  
-
-pvc_usage{**container**="pvc-exporter", **endpoint**="metrics", **instance**="10.3.179.23:8848", **job**="ok-pvc-exporter", **namespace**="default", **persistentvolume**="pvc-32d2741e-2fc5-40fe-b019-dcaccc712ef7", **persistentvolumeclaim**="local-path-pvc", **pod**="ok-pvc-exporter-m5vxj", **pvc_namespace**="default", **pvc_requested_size_MB**="128.0", **pvc_requested_size_human**="128M", **pvc_type**="hostpath", **pvc_used_MB**="98", **service**="ok-pvc-exporter"} 0.77  
+`pvc_usage{**container**="pvc-exporter", **endpoint**="metrics", **instance**="10.3.179.23:8848", **job**="ok-pvc-exporter", **namespace**="default", **persistentvolume**="pvc-32d2741e-2fc5-40fe-b019-dcaccc712ef7", **persistentvolumeclaim**="local-path-pvc", **pod**="ok-pvc-exporter-m5vxj", **pvc_namespace**="default", **pvc_requested_size_MB**="128.0", **pvc_requested_size_human**="128M", **pvc_type**="hostpath", **pvc_used_MB**="98", **service**="ok-pvc-exporter"} 0.77  `
 
 **#pvc_mapping**  
 This metrics provide mapping between pvc and pod.  
-
-pvc_mapping{**container**="pvc-exporter", **endpoint**="metrics", **host_ip**="192.168.175.129", **instance**="10.3.179.23:8848", **job**="ok-pvc-exporter", **mountedby**="volume-test", **namespace**="default", **persistentvolume**="pvc-32d2741e-2fc5-40fe-b019-dcaccc712ef7", **persistentvolumeclaim**="local-path-pvc", **pod**="ok-pvc-exporter-m5vxj", **pod_namespace**="default", **service**="ok-pvc-exporter"}
+`pvc_mapping{**container**="pvc-exporter", **endpoint**="metrics", **host_ip**="192.168.175.129", **instance**="10.3.179.23:8848", **job**="ok-pvc-exporter", **mountedby**="volume-test", **namespace**="default", **persistentvolume**="pvc-32d2741e-2fc5-40fe-b019-dcaccc712ef7", **persistentvolumeclaim**="local-path-pvc", **pod**="ok-pvc-exporter-m5vxj", **pod_namespace**="default", **service**="ok-pvc-exporter"}`
 
 # Promethesus & Grafana
 
 You can use this expression **" (sum without (container,pod,service,namespace,job,instance,endpoint,pvc_namespace,pvc_requested_size_MB) (pvc_usage)) + on(persistentvolume) group_left(persistentvolumeclaim,mountedby,pod_namespace)pvc_mapping*0 "** to grafana to monitoring pvc usage.  
 **note!!!** You can see one pvc usage percent more than 1, that's a nfs pvc. As we know the nfs and hostpath pvc will exceed the requested size if the provisioner not support quota.  
+**For dashboard, you can refer /docs/pvc-dashboard.json**  
+
 ![grafana-1](./docs/grafana-1.png)
