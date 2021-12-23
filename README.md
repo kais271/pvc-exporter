@@ -64,4 +64,4 @@ You can use this expression **" (sum without (container,pod,service,namespace,jo
 **note!!!** You can see one pvc usage percent more than 1, that's a nfs pvc. As we know the nfs and hostpath pvc will exceed the requested size if the provisioner not support quota.  
 **For dashboard, you can refer /docs/pvc-dashboard.json**  
 
-![grafana-1](./docs/grafana-1.png)
+![grafana-1](./docs/grafana-1223.png)
