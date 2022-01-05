@@ -50,10 +50,10 @@ def unit_conversion(size):
       unit=get_size[-1]
       num=get_size.split(unit)[0]
       if unit=='M':
-        MB_size=float(num)
+        MB_size=round(float(num),2)
       else:
         n=units.index(unit)-2
-        MB_size=float(num)*pow(1024,n)
+        MB_size=round(float(num)*pow(1024,n),2)
       if len(num) > 3:
         exp=len(num)//3
         human_num=round(float(num)/pow(1024,exp),2)
@@ -71,7 +71,22 @@ def unit_conversion(size):
     logger.warning(f'Not found expected info for this string: {size}')
 
 
-def get_pvc_used(pv_info,MB_size):
+def calculate_size(fs_path,total_MB_size,pvc_type):
+  if pvc_type == 'block':
+    pv_st=os.statvfs(fs_path)
+    pvc_used=str((pv_st.f_blocks - pv_st.f_bfree) * pv_st.f_frsize)+'B'
+    human_size,MB_size=unit_conversion(pvc_used)
+    pvc_used=MB_size
+    pvc_used_percent=round(float((pv_st.f_blocks - pv_st.f_bfree) * pv_st.f_frsize) / (pv_st.f_blocks * pv_st.f_frsize),2) + 0.01
+    #+0.01 to amend 
+  else:
+    get_pvc_used="du -sm %s"%(fs_path)
+    pvc_used=os.popen(get_pvc_used).readlines()[0].split('\t')[0]
+    pvc_used_percent=round(float(pvc_used) / total_MB_size,2) + 0.01
+    #+0.01 to amend 
+  return pvc_used,pvc_used_percent
+
+def get_pvc_used(pv_info,total_MB_size):
   '''
   Get pvc usage.
   The method is to mount the host path to the container, and then get the information.
@@ -79,36 +94,37 @@ def get_pvc_used(pv_info,MB_size):
   pv_name=pv_info.metadata.name
   if pv_info.spec.nfs:
     #Get nfs pvc
+    pvc_type='nfs'
     nfs_pv_path=pv_info.spec.nfs.path
     cmd="df|grep /host|grep %s"%(pv_name)
     fs_info=os.popen(cmd).readlines()
     if len(fs_info)==1:
-      fs_path=fs_info[0].split(' ')[-1]
-    get_pvc_used="du -sm %s"%(fs_path)
-    pvc_used=os.popen(get_pvc_used).readlines()[0].split('\t')[0]
-    pvc_used_percent=round(float(pvc_used)/MB_size,2)
-    pvc_type='nfs'
+      fs_path=(fs_info[0].split(' ')[-1]).rstrip()
+    pvc_used,pvc_used_percent=calculate_size(fs_path,total_MB_size,pvc_type)
   elif pv_info.spec.host_path:
     #Get hostpat pvc
-    host_pv_path=pv_info.spec.host_path.path
-    fs_path='/host'+host_pv_path
-    get_pvc_used="du -sm %s"%(fs_path)
-    pvc_used=os.popen(get_pvc_used).readlines()[0].split('\t')[0]
-    pvc_used_percent=round(float(pvc_used)/MB_size,2)
     pvc_type='hostpath'
+    host_pv_path=pv_info.spec.host_path.path
+    fs_path=('/host'+host_pv_path).rstrip()
+    pvc_used,pvc_used_percent=calculate_size(fs_path,total_MB_size,pvc_type)
   else:
     #Get block PVC
-    get_pvc_used="df -h|grep -E 'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts'|grep '%s'"%(pv_name)
+    pvc_type='block'
+    block_pvc_rex=re.compile(r'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts')
     try:
-      returned_fs_info=os.popen(get_pvc_used).readlines()
-      for size_info in returned_fs_info:
-        if re.search("\d%",size_info):
-          returned_fs_size_info=size_info.split()
-      if returned_fs_size_info[3].find('%') > 0:
-        human_size,MB_size=unit_conversion(returned_fs_size_info[1])
-        pvc_used=MB_size
-        pvc_used_percent=round(float(returned_fs_size_info[3].strip('%'))/100,2)
-        pvc_type='block'
+      mtab=open('/etc/mtab','r')
+      read_mtab=mtab.readlines()
+      mtab.close()
+      check_block=[]
+      for mp in read_mtab:
+        if pv_name in mp and block_pvc_rex.search(mp):
+          check_block.append(mp)
+      if len(check_block) != 1:
+        raise
+      else:
+        fs_path=((check_block[0]).split(' ')[1]).rstrip()
+        total_MB_size
+        pvc_used,pvc_used_percent=calculate_size(fs_path,total_MB_size,pvc_type)
     except:
       logger.error(f'Cannot resovle this pv {pv_name}')
       traceback.print_exc()
