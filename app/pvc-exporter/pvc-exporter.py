@@ -15,9 +15,9 @@ start_http_server(EXPORTER_SERVER_PORT)
 
 #Provide 2 metric: pvc_usage, pvc_mapping
 metric_pvc_usage=Gauge('pvc_usage','The value is PVC usage percent that equal to pvc_used_MB/pvc_requested_size_MB',
-['persistentvolumeclaim','persistentvolume','pvc_namespace','pvc_used_MB','pvc_requested_size_MB','pvc_requested_size_human','pvc_type'])
+['persistentvolumeclaim','persistentvolume','pvc_namespace','pvc_used_MB','pvc_requested_size_MB','pvc_requested_size_human','pvc_type','grafana_key'])
 metric_pvc_mapping=Gauge('pvc_mapping','Fetching the mapping between pvc and pod',
-['persistentvolumeclaim','persistentvolume','mountedby','pod_namespace','host_ip'])
+['persistentvolumeclaim','persistentvolume','mountedby','pod_namespace','host_ip','grafana_key'])
 
 #Initialize the logging
 formatter=logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -101,16 +101,19 @@ def get_pvc_used(pv_info,total_MB_size):
     if len(fs_info)==1:
       fs_path=(fs_info[0].split(' ')[-1]).rstrip()
     pvc_used,pvc_used_percent=calculate_size(fs_path,total_MB_size,pvc_type)
-  elif pv_info.spec.host_path:
+  elif pv_info.spec.host_path or pv_info.spec.local:
     #Get hostpat pvc
     pvc_type='hostpath'
-    host_pv_path=pv_info.spec.host_path.path
+    if pv_info.spec.host_path:
+      host_pv_path=pv_info.spec.host_path.path
+    else:
+      host_pv_path=pv_info.spec.local.path
     fs_path=('/host'+host_pv_path).rstrip()
     pvc_used,pvc_used_percent=calculate_size(fs_path,total_MB_size,pvc_type)
   else:
     #Get block PVC
     pvc_type='block'
-    block_pvc_rex=re.compile(r'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io/gce-pd/mounts')
+    block_pvc_rex=re.compile(r'kubernetes.io/flexvolume|kubernetes.io~csi|kubernetes.io~cephfs|kubernetes.io/gce-pd/mounts')
     try:
       mtab=open('/etc/mtab','r')
       read_mtab=mtab.readlines()
@@ -196,18 +199,20 @@ while 1:
                       7-pod_name
                       8-ns
                       9-host_ip
+                      10-grfana_key
                     '''
+                    grfana_key=pv_name+'-'+host_ip
                     id_key=mounted_pvc+'-'+ns
                     if id_key in pool.keys():
-                      metric_pvc_usage.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][4],pool[id_key][2],pool[id_key][3],pool[id_key][6])
-                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type).set(pvc_used_percent)
-                      metric_pvc_mapping.remove(pool[id_key][0],pool[id_key][1],pool[id_key][7],pool[id_key][8],pool[id_key][9])
-                      metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip)
-                      pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip]
+                      metric_pvc_usage.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][4],pool[id_key][2],pool[id_key][3],pool[id_key][6],pool[id_key][10])
+                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type,grfana_key).set(pvc_used_percent)
+                      metric_pvc_mapping.remove(pool[id_key][0],pool[id_key][1],pool[id_key][7],pool[id_key][8],pool[id_key][9],pool[id_key][10])
+                      metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip,grfana_key)
+                      pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip,grfana_key]
                     else:
-                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type).set(pvc_used_percent)
-                      metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip)
-                      pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip]
+                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type,grfana_key).set(pvc_used_percent)
+                      metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip,grfana_key)
+                      pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip,grfana_key]
 
           except:
             logger.error(f'Cannot resolve the spec for this pod: {pod_name}')
