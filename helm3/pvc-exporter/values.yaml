@@ -16,7 +16,7 @@ PvcExporter:
   ##
   image:
     repository: dockerid31415926/pvc-exporter
-    tag: v0.1.3-beta
+    tag: v0.1.3-rc
     pullPolicy: IfNotPresent
     pullSecrets: []
   

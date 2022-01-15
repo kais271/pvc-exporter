@@ -201,7 +201,7 @@ while 1:
                       9-host_ip
                       10-grfana_key
                     '''
-                    grfana_key=pv_name+'-'+host_ip
+                    grfana_key=pv_name+'-'+pod_name
                     id_key=mounted_pvc+'-'+ns
                     if id_key in pool.keys():
                       metric_pvc_usage.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][4],pool[id_key][2],pool[id_key][3],pool[id_key][6],pool[id_key][10])
