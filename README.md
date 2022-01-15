@@ -12,7 +12,7 @@
 ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pod-pvc-mapping?color=green&label=pod-pvc-mapping)
 ![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pod-pvc-mapping?color=green)  
 
-This project provides 2 metrics,one for monitoring mounted pvc usage named **"pvc_usage"**, and one for provides the mapping between pod and pvc named **"pvc_mapping"**.
+This project provides 2 metrics to monitoring **block storage, hostpath and nfs** pvcs. One for monitoring mounted pvc usage named **"pvc_usage"**, and one for provides the mapping between pod and pvc named **"pvc_mapping"**.
 
 # Note  
 Now, the hostpath pvc and nfs pvc will be supported starting with version 0.1.3. So we currently support 3 types of pvc: hostpath, nfs, blockstorage.  
