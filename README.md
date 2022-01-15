@@ -20,6 +20,8 @@ For blockstorage just supported the pvc mounted as **"volumeMounts"**. If your p
 
 **Architecture Change:**  
 1. Previously, **"pvc_usage"** and **"pvc_mapping"** were divided into 2 images. Now, they have merged into one image, called **pvc-exporter**. In addition, the field of the metrics have also been changed.   
+![image](https://user-images.githubusercontent.com/19722587/149618515-50ac2e45-4ff1-422d-9ca5-0aacc417bbda.png)
+
 2. Based on the development of k8s, the native metrics like **kubelet_volume_stats_used_bytes** was now able to work normally and part of the demand has been met. So the **pod-pvc-mapping** project is maintained separately now, you can use this alone with the native metrics to monitoring pvc.  
 3. If you want to upgrade to v0.1.3, we recommend that you uninstall old version then install new version.  
 
