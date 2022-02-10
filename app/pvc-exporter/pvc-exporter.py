@@ -122,11 +122,10 @@ def get_pvc_used(pv_info,total_MB_size):
       for mp in read_mtab:
         if pv_name in mp and block_pvc_rex.search(mp):
           check_block.append(mp)
-      if len(check_block) != 1:
+      if len(check_block) < 1:
         raise
       else:
         fs_path=((check_block[0]).split(' ')[1]).rstrip()
-        total_MB_size
         pvc_used,pvc_used_percent=calculate_size(fs_path,total_MB_size,pvc_type)
     except:
       logger.error(f'Cannot resovle this pv {pv_name}')
@@ -167,8 +166,10 @@ while 1:
       pods=get_items(k8s_api_obj.list_namespaced_pod(ns))
       for po in pods:
         pod_name=po['metadata']['name']
-        pod_host_ip=k8s_api_obj.read_namespaced_pod(pod_name,ns).status.host_ip
-        if pod_host_ip == HOST_IP:
+        pod_status=k8s_api_obj.read_namespaced_pod(pod_name,ns).status
+        pod_host_ip=pod_status.host_ip
+        pod_phase=pod_status.phase
+        if pod_host_ip == HOST_IP and pod_phase == 'Running':
           #if this pod on current host, then try to get pod info
           try:
             for vol in po['spec']['volumes']:
@@ -202,7 +203,7 @@ while 1:
                       10-grfana_key
                     '''
                     grfana_key=pv_name+'-'+pod_name
-                    id_key=mounted_pvc+'-'+ns
+                    id_key=mounted_pvc+'-'+ns+'-'+pod_name
                     if id_key in pool.keys():
                       metric_pvc_usage.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][4],pool[id_key][2],pool[id_key][3],pool[id_key][6],pool[id_key][10])
                       metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type,grfana_key).set(pvc_used_percent)
@@ -217,5 +218,5 @@ while 1:
           except:
             logger.error(f'Cannot resolve the spec for this pod: {pod_name}')
             traceback.print_exc()
-  logger.info("Will sleep ...")
+  logger.info(f'Will sleep {SCAN_INTERVAL}s...')
   time.sleep(SCAN_INTERVAL)
