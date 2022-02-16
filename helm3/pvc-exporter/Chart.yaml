@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 0.1.3-rc
+appVersion: 0.1.3
 name: pvc-exporter
 type: application
-version: 0.1.3-rc
+version: 0.1.3
