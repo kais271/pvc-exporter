@@ -51,26 +51,26 @@ helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v
 #This will be provide 2 metrics: pvc_usage and pvc_mapping 
 helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/  
 kubectl create namespace pvc-exporter  
-helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.3-rc  
+helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.3  
 
 #If you just want to get pvc_mapping:  
 helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/
 kubectl create namespace pod-pvc-mapping
-helm install demo pvc-exporter/pod-pvc-mapping --namespace pod-pvc-mapping --version v0.1.3-rc  
+helm install demo pvc-exporter/pod-pvc-mapping --namespace pod-pvc-mapping --version v0.1.3  
 ```
 # Metrics Examples  
 **#pvc_usage**  
 The value is pvc usage percent that equal pvc_used_MB/pvc_requested_MB. Some informations about pvc is also provided.  
-`pvc_usage{**container**="pvc-exporter", **endpoint**="metrics", **instance**="10.3.179.23:8848", **job**="ok-pvc-exporter", **namespace**="default", **persistentvolume**="pvc-32d2741e-2fc5-40fe-b019-dcaccc712ef7", **persistentvolumeclaim**="local-path-pvc", **pod**="ok-pvc-exporter-m5vxj", **pvc_namespace**="default", **pvc_requested_size_MB**="128.0", **pvc_requested_size_human**="128M", **pvc_type**="hostpath", **pvc_used_MB**="98", **service**="ok-pvc-exporter"} 0.77  `
+`pvc_usage{container="pvc-exporter", endpoint="metrics", grafana_key="pvc-957af729-41e3-40cc-b90d-71ffab0ec149-web-3", instance="10.3.179.59:8848", job="demo-pvc-exporter", namespace="pvc-exporter", persistentvolume="pvc-957af729-41e3-40cc-b90d-71ffab0ec149", persistentvolumeclaim="www-web-3", pod="demo-pvc-exporter-phbmt", pvc_namespace="default", pvc_requested_size_MB="1024.0", pvc_requested_size_human="1G", pvc_type="block", pvc_used_MB="2.5", service="demo-pvc-exporter"} 0.01  `
 
 **#pvc_mapping**  
 This metrics provide mapping between pvc and pod.  
-`pvc_mapping{**container**="pvc-exporter", **endpoint**="metrics", **host_ip**="192.168.175.129", **instance**="10.3.179.23:8848", **job**="ok-pvc-exporter", **mountedby**="volume-test", **namespace**="default", **persistentvolume**="pvc-32d2741e-2fc5-40fe-b019-dcaccc712ef7", **persistentvolumeclaim**="local-path-pvc", **pod**="ok-pvc-exporter-m5vxj", **pod_namespace**="default", **service**="ok-pvc-exporter"}`
+`pvc_mapping{container="pvc-exporter", endpoint="metrics", grafana_key="pvc-e555d811-c0b1-4e0b-b3ee-25c7cb1c66ee-web-0", host_ip="192.168.175.129", instance="10.3.179.59:8848", job="demo-pvc-exporter", mountedby="web-0", namespace="pvc-exporter", persistentvolume="pvc-e555d811-c0b1-4e0b-b3ee-25c7cb1c66ee", persistentvolumeclaim="www-web-0", pod="demo-pvc-exporter-phbmt", pod_namespace="default", service="demo-pvc-exporter"} 0`
 
 # Promethesus & Grafana
 
-You can use this expression **" (sum without (container,pod,service,namespace,job,instance,endpoint,pvc_namespace,pvc_requested_size_MB) (pvc_usage)) + on(persistentvolume) group_left(persistentvolumeclaim,mountedby,pod_namespace)pvc_mapping*0 "** to grafana to monitoring pvc usage.  
+You can use this expression **" sum without (grafana_key,container,pod,service,namespace,job,instance,endpoint,pvc_namespace,pvc_requested_size_MB) ( (pvc_usage) + on(grafana_key) group_left(persistentvolumeclaim,mountedby,pod_namespace)pvc_mapping*0) "** to grafana to monitoring pvc usage.  
 **note!!!** You can see one pvc usage percent more than 1, that's a nfs pvc. As we know the nfs and hostpath pvc will exceed the requested size if the provisioner not support quota.  
-**For dashboard, you can refer /docs/pvc-dashboard.json**  
+**For dashboard, you can refer /docs/PVC-Dashboard.json**  
 
 ![grafana-1](./docs/grafana-1223.png)
