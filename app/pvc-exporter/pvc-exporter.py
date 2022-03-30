@@ -98,7 +98,7 @@ def get_pvc_used(pv_info,total_MB_size):
     nfs_pv_path=pv_info.spec.nfs.path
     cmd="df|grep /host|grep %s"%(pv_name)
     fs_info=os.popen(cmd).readlines()
-    if len(fs_info)==1:
+    if len(fs_info)>1:
       fs_path=(fs_info[0].split(' ')[-1]).rstrip()
     pvc_used,pvc_used_percent=calculate_size(fs_path,total_MB_size,pvc_type)
   elif pv_info.spec.host_path or pv_info.spec.local:
@@ -142,7 +142,7 @@ PVC --> POD:
   Many-to-Many
 '''
 
-while 1:
+while True:
   config.load_incluster_config()
   k8s_api_obj=client.CoreV1Api()
   all_pvc=get_items(k8s_api_obj.list_persistent_volume_claim_for_all_namespaces())
