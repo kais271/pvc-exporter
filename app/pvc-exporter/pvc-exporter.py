@@ -98,7 +98,7 @@ def get_pvc_used(pv_info,total_MB_size):
     nfs_pv_path=pv_info.spec.nfs.path
     cmd="df|grep /host|grep %s"%(pv_name)
     fs_info=os.popen(cmd).readlines()
-    if len(fs_info)==1:
+    if len(fs_info)>=1:
       fs_path=(fs_info[0].split(' ')[-1]).rstrip()
     pvc_used,pvc_used_percent=calculate_size(fs_path,total_MB_size,pvc_type)
   elif pv_info.spec.host_path or pv_info.spec.local:
@@ -166,7 +166,11 @@ while 1:
       pods=get_items(k8s_api_obj.list_namespaced_pod(ns))
       for po in pods:
         pod_name=po['metadata']['name']
-        pod_status=k8s_api_obj.read_namespaced_pod(pod_name,ns).status
+        try:
+          pod_status=k8s_api_obj.read_namespaced_pod(pod_name,ns).status
+        except:
+          traceback.print_exc()
+          continue
         pod_host_ip=pod_status.host_ip
         pod_phase=pod_status.phase
         if pod_host_ip == HOST_IP and pod_phase == 'Running':
