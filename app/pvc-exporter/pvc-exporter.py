@@ -3,21 +3,23 @@ import re
 import time
 import logging
 import traceback
-from kubernetes import client, config
+import kubernetes
 from prometheus_client import start_http_server, Gauge
 
 EXPORTER_SERVER_PORT=int(os.getenv('EXPORTER_SERVER_PORT'))
 SCAN_INTERVAL=float(os.getenv('SCAN_INTERVAL'))
 HOST_IP=os.getenv('HOST_IP')
+#LOG_LEVEL=os.getenv("LOG_LEVEL")
 
 #start metrics server
 start_http_server(EXPORTER_SERVER_PORT)
 
 #Provide 2 metric: pvc_usage, pvc_mapping
 metric_pvc_usage=Gauge('pvc_usage','The value is PVC usage percent that equal to pvc_used_MB/pvc_requested_size_MB',
-['persistentvolumeclaim','persistentvolume','pvc_namespace','pvc_used_MB','pvc_requested_size_MB','pvc_requested_size_human','pvc_type','grafana_key'])
+['persistentvolumeclaim','persistentvolume','pvc_namespace','pvc_requested_size_MB','pvc_requested_size_human','pvc_type','grafana_key'])
 metric_pvc_mapping=Gauge('pvc_mapping','Fetching the mapping between pvc and pod',
 ['persistentvolumeclaim','persistentvolume','mountedby','pod_namespace','host_ip','grafana_key'])
+metric_pvc_used_MB=Gauge('pvc_used_MB','The unit is MB for size of pvc used',['persistentvolumeclaim','persistentvolume','namespace','host_ip','grafana_key'])
 
 #Initialize the logging
 formatter=logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -68,7 +70,7 @@ def unit_conversion(size):
       logger.warning(f'Not found expected info for this string: {size}')
   except:
     traceback.print_exc()
-    logger.warning(f'Not found expected info for this string: {size}')
+    logger.debug(f'Not found expected info for this string: {size}')
 
 
 def calculate_size(fs_path,total_MB_size,pvc_type):
@@ -141,10 +143,72 @@ PVC --> POD:
   Many-to-One
   Many-to-Many
 '''
+def gauge_remove(pool,id_key):
+  metric_pvc_usage.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][2],pool[id_key][3],pool[id_key][6],pool[id_key][10])
+  metric_pvc_mapping.remove(pool[id_key][0],pool[id_key][1],pool[id_key][7],pool[id_key][8],pool[id_key][9],pool[id_key][10])
+  metric_pvc_used_MB.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][9],pool[id_key][10])
+
+def gauge_label():
+  metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_requested_size_MB,pvc_requested_size_human,pvc_type,grafana_key).set(pvc_used_percent)
+  metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip,grafana_key)
+  metric_pvc_used_MB.labels(mounted_pvc,pv_name,ns,host_ip,grafana_key).set(pvc_used_MB)
+
+def check_pvc(pool,k8s_api_obj):
+  inexistent_pvc=[]
+  for id_key in pool.keys():
+    pvc_name=id_key.split('@')[0]
+    pvc_ns=id_key.split('@')[1]
+    pod_name=id_key.split('@')[2]
+    try:
+      '''
+      Determine if the PVC still exists
+      '''
+      k8s_api_obj.read_namespaced_persistent_volume_claim(pvc_name,pvc_ns)
+    except kubernetes.client.exceptions.ApiException as e:
+      if e.status == 404:
+        gauge_remove(pool,id_key)
+        inexistent_pvc.append(id_key)
+        logger.info(f'PVC has been removed --> NS: {pvc_ns}, PVC: {pvc_name}')
+    else:
+      try:
+        pod=k8s_api_obj.read_namespaced_pod(pod_name,pvc_ns)
+        pod_host_ip=pod.status.host_ip
+        pod_phase=pod.status.phase
+        logger.debug(f'Get pod success: {pod_name}:{pod_phase}')
+        if pod_host_ip == HOST_IP and pod_phase == 'Running':
+          mounted_pvc=[]
+          #if this pod on current host, then try to get pod info
+          for vol in pod.spec.volumes:
+          #find pvc in pod
+            if vol.persistent_volume_claim:
+              mounted_pvc.append(vol.persistent_volume_claim.claim_name)
+          if len(mounted_pvc) > 0 and pvc_name in mounted_pvc:
+            pass
+          else:
+            gauge_remove(pool,id_key)
+            inexistent_pvc.append(id_key)
+            logger.info(f'PVC status has been changed --> NS: {pvc_ns}, PVC: {pvc_name}')
+      except kubernetes.client.exceptions.ApiException as e:
+        if e.status == 404:
+          logger.debug(f'{pod_name} has been killed.')
+          gauge_remove(pool,id_key)
+          inexistent_pvc.append(id_key)
+          logger.info(f'PVC has been removed --> NS: {pvc_ns}, PVC: {pvc_name}')
+      else:
+        logger.debug(f'{traceback.print_exc()}')
+        continue
+  return inexistent_pvc
+
+def clean_inexistent_pvc(inexistent_pvc,pool):
+  if inexistent_pvc:
+    for pvc in inexistent_pvc:
+      pool.pop(pvc)
+  else:
+    pass
 
 while 1:
-  config.load_incluster_config()
-  k8s_api_obj=client.CoreV1Api()
+  kubernetes.config.load_incluster_config()
+  k8s_api_obj=kubernetes.client.CoreV1Api()
   all_pvc=get_items(k8s_api_obj.list_persistent_volume_claim_for_all_namespaces())
   if len(all_pvc)==0:
     logger.warning("No pvc found in this cluster.")
@@ -204,23 +268,21 @@ while 1:
                       7-pod_name
                       8-ns
                       9-host_ip
-                      10-grfana_key
+                      10-grafana_key
                     '''
-                    grfana_key=pv_name+'-'+pod_name
-                    id_key=mounted_pvc+'-'+ns+'-'+pod_name
+                    grafana_key=pv_name+'-'+pod_name
+                    id_key=mounted_pvc+'@'+ns+'@'+pod_name
                     if id_key in pool.keys():
-                      metric_pvc_usage.remove(pool[id_key][0],pool[id_key][1],pool[id_key][8],pool[id_key][4],pool[id_key][2],pool[id_key][3],pool[id_key][6],pool[id_key][10])
-                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type,grfana_key).set(pvc_used_percent)
-                      metric_pvc_mapping.remove(pool[id_key][0],pool[id_key][1],pool[id_key][7],pool[id_key][8],pool[id_key][9],pool[id_key][10])
-                      metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip,grfana_key)
-                      pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip,grfana_key]
+                      gauge_remove(pool,id_key)
+                      gauge_label()
+                      pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip,grafana_key]
                     else:
-                      metric_pvc_usage.labels(mounted_pvc,pv_name,ns,pvc_used_MB,pvc_requested_size_MB,pvc_requested_size_human,pvc_type,grfana_key).set(pvc_used_percent)
-                      metric_pvc_mapping.labels(mounted_pvc,pv_name,pod_name,ns,host_ip,grfana_key)
-                      pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip,grfana_key]
-
+                      gauge_label()
+                      pool[id_key]=[mounted_pvc,pv_name,pvc_requested_size_MB,pvc_requested_size_human,pvc_used_MB,pvc_used_percent,pvc_type,pod_name,ns,host_ip,grafana_key]
           except:
             logger.error(f'Cannot resolve the spec for this pod: {pod_name}')
             traceback.print_exc()
+  inexistent_pvc=check_pvc(pool,k8s_api_obj)
+  clean_inexistent_pvc(inexistent_pvc,pool)
   logger.info(f'Will sleep {SCAN_INTERVAL}s...')
   time.sleep(SCAN_INTERVAL)
