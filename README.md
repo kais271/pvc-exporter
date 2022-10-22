@@ -1,29 +1,17 @@
 # pvc-exporter
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/pvc-exporter)](https://artifacthub.io/packages/search?repo=pvc-exporter)  
-**As of v0.1.2**  
-![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/block-pvc-scanner?label=block-pvc-scanner)
-![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/block-pvc-scanner)
-![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pod-pvc-mapping?color=green&label=pod-pvc-mapping)
-![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pod-pvc-mapping?color=green)  
-**Since v0.1.3**  
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/pvc-exporter)](https://artifacthub.io/packages/search?repo=pvc-exporter)
 ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pvc-exporter?label=pvc-exporter)
-![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pvc-exporter)  
-![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dockerid31415926/pod-pvc-mapping?color=green&label=pod-pvc-mapping)
-![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pod-pvc-mapping?color=green)  
+![Docker Pulls](https://img.shields.io/docker/pulls/dockerid31415926/pvc-exporter)
 
-This project provides 2 metrics to monitoring **block storage, hostpath and nfs** pvcs. One for monitoring mounted pvc usage named **"pvc_usage"**, and one for provides the mapping between pod and pvc named **"pvc_mapping"**.
 
-# Note  
-Now, the hostpath pvc and nfs pvc will be supported starting with version 0.1.3. So we currently support 3 types of pvc: hostpath, nfs, blockstorage.  
-For blockstorage just supported the pvc mounted as **"volumeMounts"**. If your pv is block model and mounted as **"volumeDevices"** that not supported yet. 
+This exporter provides 3 metrics to monitoring **block storage, hostpath and nfs** pvcs.  
+1. **pvc_usage**: Provides the percentage of PVC usage.  
+2. **pvc_mapping**: Provides the mapping between pod and pvc.  
+3. **pvc_used_MB**: Provide the specific usage of PVC, the unit is MB.  
 
-**Architecture Change:**  
-1. Previously, **"pvc_usage"** and **"pvc_mapping"** were divided into 2 images. Now, they have merged into one image, called **pvc-exporter**. In addition, the field of the metrics have also been changed.   
-![image](https://user-images.githubusercontent.com/19722587/149618515-50ac2e45-4ff1-422d-9ca5-0aacc417bbda.png)
-
-2. Based on the development of k8s, the native metrics like **kubelet_volume_stats_used_bytes** was now able to work normally and part of the demand has been met. So the **pod-pvc-mapping** image is maintained separately now, you can use this alone with the native metrics to monitoring pvc.  
-3. If you want to upgrade to v0.1.3, we recommend that you uninstall old version then install new version.  
+# Why choose pvc-exporter?
+If you want to monitor pvc usage and the native mertics are not available. 
 
 # Support list
 The following storage provisioners has been tested..  
@@ -36,27 +24,15 @@ The following storage provisioners has been tested..
 ...  
 
 The following architectures:  
-1.x86_64  
+1.X86_64  
 2.ARM64  
 
  
 # Usage  
 ```
-###v0.1.2###
 helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/  
 kubectl create namespace pvc-exporter  
-helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.2  
-    
-###v0.1.3###
-#This will be provide 2 metrics: pvc_usage and pvc_mapping 
-helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/  
-kubectl create namespace pvc-exporter  
-helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.3  
-
-#If you just want to get pvc_mapping:  
-helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/
-kubectl create namespace pod-pvc-mapping
-helm install demo pvc-exporter/pod-pvc-mapping --namespace pod-pvc-mapping --version v0.1.3  
+helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.4-alpha  
 ```
 # Metrics Examples  
 **#pvc_usage**  
