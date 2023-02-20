@@ -32,7 +32,7 @@ The following architectures:
 ```
 helm repo add pvc-exporter https://kais271.github.io/pvc-exporter/helm3/charts/  
 kubectl create namespace pvc-exporter  
-helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.4-alpha  
+helm install demo pvc-exporter/pvc-exporter --namespace pvc-exporter --version v0.1.4-beta  
 ```
 # Metrics Examples  
 **#pvc_usage**  
