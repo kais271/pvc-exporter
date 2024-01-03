@@ -6,6 +6,9 @@ metadata:
   labels:
     app: {{ $fullName }}
     release: prome
+    {{- if .Values.serviceMonitor.additionalLabels }}
+      {{- toYaml .Values.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
   name: {{ $fullName }}
   namespace: {{.Release.Namespace}}
 spec:
